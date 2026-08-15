@@ -15,6 +15,7 @@
 import { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useT } from '@/i18n';
 
 export interface MarkdownPreviewProps {
   source: string;
@@ -47,6 +48,7 @@ function isRelativeMd(href: string): boolean {
 export const MarkdownPreview = memo(function MarkdownPreview({
   source, baseRel, onOpenMarkdownLink
 }: MarkdownPreviewProps) {
+  const t = useT();
   return (
     <div className="cth-md-preview">
       <ReactMarkdown
@@ -78,7 +80,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
           // as a placeholder chip instead of a broken-image icon.
           img: ({ alt, src }) => (
             <span className="cth-md-img" title={typeof src === 'string' ? src : undefined}>
-              🖼 {alt || 'image'}
+              🖼 {alt || t('markdownPreview.image', 'image')}
             </span>
           )
         }}

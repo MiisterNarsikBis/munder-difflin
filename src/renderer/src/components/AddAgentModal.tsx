@@ -596,7 +596,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                           <button
                             key={c.name}
                             onClick={() => { setCharacter(c.name); setName(c.displayName); }}
-                            title={c.blurb}
+                            title={t(`addAgentModal.castBlurb.${c.name}`, c.blurb)}
                             style={{
                               padding: 4,
                               background: character === c.name ? `var(--cth-${accent}-light)` : 'var(--cth-cream-100)',

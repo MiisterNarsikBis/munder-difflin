@@ -1358,5 +1358,29 @@ export const FR: Record<string, string> = {
   'idePanel.save': 'enregistrer',
   'idePanel.railTab.changes': 'modifs',
   'idePanel.railTab.history': 'historique',
-  'idePanel.railTab.compare': 'comparer'
+  'idePanel.railTab.compare': 'comparer',
+
+  // ── ide/MonacoEditor.tsx / MonacoDiff.tsx ─────────────────────────────────
+  'monacoEditor.loadingEditor': 'chargement de l’éditeur…',
+  'monacoDiff.loadingDiff': 'chargement du diff…',
+
+  // ── markdown/MarkdownPreview.tsx ──────────────────────────────────────────
+  'markdownPreview.image': 'image',
+
+  // ── components/AddAgentModal.tsx (cast blurbs) ────────────────────────────
+  'addAgentModal.castBlurb.michael': 'Le meilleur patron du monde',
+  'addAgentModal.castBlurb.jim': 'Vendeur, farceur',
+  'addAgentModal.castBlurb.pam': 'Réceptionniste, artiste',
+  'addAgentModal.castBlurb.dwight': 'Assistant (au) directeur régional',
+  'addAgentModal.castBlurb.kevin': 'Comptabilité',
+  'addAgentModal.castBlurb.angela': 'Chef comptable',
+  'addAgentModal.castBlurb.oscar': 'Comptable',
+  'addAgentModal.castBlurb.stanley': 'Ventes, mots croisés',
+  'addAgentModal.castBlurb.phyllis': 'Ventes',
+  'addAgentModal.castBlurb.andy': 'Cornell, chant a cappella',
+  'addAgentModal.castBlurb.kelly': 'Service client',
+  'addAgentModal.castBlurb.ryan': 'Le stagiaire',
+  'addAgentModal.castBlurb.toby': 'Ressources humaines',
+  'addAgentModal.castBlurb.creed': 'Assurance qualité',
+  'addAgentModal.castBlurb.meredith': 'Relations fournisseurs'
 };
