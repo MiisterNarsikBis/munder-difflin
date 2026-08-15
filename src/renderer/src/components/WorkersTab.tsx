@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { PixelButton } from './PixelButton';
+import { useT, t as translate } from '@/i18n';
 
 /**
  * WORKERS — live god-triggered ephemeral Slack workers (the Phase-1 spawn loop):
@@ -18,13 +19,13 @@ type PreservedWorktreeSnapshot = WorkersData['preserved'][number];
 const POLL_MS = 2000;
 
 function relAge(ms: number): string {
-  if (ms < 1000) return '0s';
+  if (ms < 1000) return '0' + translate('workersTab.unit.s', 's');
   const s = Math.round(ms / 1000);
-  if (s < 90) return `${s}s`;
+  if (s < 90) return `${s}` + translate('workersTab.unit.s', 's');
   const m = Math.round(s / 60);
-  if (m < 90) return `${m}m`;
+  if (m < 90) return `${m}` + translate('workersTab.unit.m', 'm');
   const h = Math.round(m / 60);
-  return h < 48 ? `${h}h` : `${Math.round(h / 24)}d`;
+  return h < 48 ? `${h}` + translate('workersTab.unit.h', 'h') : `${Math.round(h / 24)}` + translate('workersTab.unit.d', 'd');
 }
 
 function fmtTokens(n: number): string {
@@ -47,6 +48,7 @@ const sectionHead: React.CSSProperties = {
 };
 
 function StatusBadge({ w }: { w: WorkerSnapshot }) {
+  const t = useT();
   const releasing = w.status === 'releasing';
   return (
     <span style={{
@@ -56,12 +58,13 @@ function StatusBadge({ w }: { w: WorkerSnapshot }) {
       background: releasing ? 'var(--cth-ink-700)' : 'var(--cth-green, #2f8f4e)',
       boxShadow: releasing ? 'none' : 'inset 0 0 0 1px var(--cth-ink-100)'
     }}>
-      {releasing ? 'stopping' : 'working'}
+      {releasing ? t('workersTab.stopping', 'stopping') : t('workersTab.working', 'working')}
     </span>
   );
 }
 
 export function WorkersTab() {
+  const t = useT();
   const [data, setData] = useState<WorkersData | null>(null);
   const [stopping, setStopping] = useState<Record<string, boolean>>({});
 
@@ -90,18 +93,18 @@ export function WorkersTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '12px 14px 16px', overflow: 'auto' }}>
       <div>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <span style={sectionHead}>Live workers</span>
+          <span style={sectionHead}>{t('workersTab.liveWorkers', 'Live workers')}</span>
           <span style={{ fontFamily: 'var(--cth-font-mono)', fontSize: 11, color: 'var(--cth-ink-700)' }}>
             {live.length} / {max}
           </span>
         </div>
         <p style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 11, color: 'var(--cth-ink-700)', margin: '2px 0 8px' }}>
-          Isolated workers Michael spins up to handle Slack messages — they run to completion, reply in-thread, then tear down.
+          {t('workersTab.liveWorkersBlurb', 'Isolated workers Michael spins up to handle Slack messages — they run to completion, reply in-thread, then tear down.')}
         </p>
 
         {live.length === 0 ? (
           <div style={{ ...card, color: 'var(--cth-ink-700)', fontFamily: 'var(--cth-font-ui)', fontSize: 12 }}>
-            No workers running right now.
+            {t('workersTab.noneRunning', 'No workers running right now.')}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -115,7 +118,7 @@ export function WorkersTab() {
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                     }}>{w.name}</span>
                     {w.hasSlack && (
-                      <span title="replies to a Slack thread" style={{
+                      <span title={t('workersTab.repliesToSlack', 'replies to a Slack thread')} style={{
                         fontFamily: 'var(--cth-font-mono)', fontSize: 10, color: 'var(--cth-ink-700)',
                         boxShadow: 'inset 0 0 0 1px var(--cth-ink-100)', padding: '0 5px'
                       }}>slack</span>
@@ -125,18 +128,18 @@ export function WorkersTab() {
                     onClick={() => stop(w.workerId)}
                     disabled={w.releasing || !!stopping[w.workerId]}
                   >
-                    {w.releasing || stopping[w.workerId] ? 'stopping…' : 'stop'}
+                    {w.releasing || stopping[w.workerId] ? t('workersTab.stoppingEllipsis', 'stopping…') : t('workersTab.stop', 'stop')}
                   </PixelButton>
                 </div>
                 <div style={metaRow}>
-                  <span title="worker / PTY id">{w.workerId}</span>
-                  <span title="base branch the worktree was cut from">base: {w.baseBranch}</span>
-                  <span title="time since spawn">up {relAge(w.ageMs)}</span>
-                  <span title="time since last terminal output">
-                    {w.idleMs === null ? 'pty gone' : `idle ${relAge(w.idleMs)}`}
+                  <span title={t('workersTab.workerPtyId', 'worker / PTY id')}>{w.workerId}</span>
+                  <span title={t('workersTab.baseBranchTitle', 'base branch the worktree was cut from')}>{t('workersTab.base', 'base: {branch}', { branch: w.baseBranch })}</span>
+                  <span title={t('workersTab.timeSinceSpawn', 'time since spawn')}>{t('workersTab.up', 'up {age}', { age: relAge(w.ageMs) })}</span>
+                  <span title={t('workersTab.timeSinceOutput', 'time since last terminal output')}>
+                    {w.idleMs === null ? t('workersTab.ptyGone', 'pty gone') : t('workersTab.idle', 'idle {age}', { age: relAge(w.idleMs) })}
                   </span>
-                  <span title="cumulative tokens (input+output+cache)">
-                    tokens {fmtTokens(w.tokensUsed)}{w.tokenCap !== null ? ` / ${fmtTokens(w.tokenCap)}` : ' · uncapped'}
+                  <span title={t('workersTab.cumulativeTokens', 'cumulative tokens (input+output+cache)')}>
+                    {t('workersTab.tokens', 'tokens {n}', { n: fmtTokens(w.tokensUsed) })}{w.tokenCap !== null ? ` / ${fmtTokens(w.tokenCap)}` : ' · ' + t('workersTab.uncapped', 'uncapped')}
                   </span>
                 </div>
               </div>
@@ -147,9 +150,9 @@ export function WorkersTab() {
 
       {preserved.length > 0 && (
         <div>
-          <span style={sectionHead}>Preserved worktrees ({preserved.length})</span>
+          <span style={sectionHead}>{t('workersTab.preservedWorktrees', 'Preserved worktrees ({n})', { n: preserved.length })}</span>
           <p style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 11, color: 'var(--cth-ink-700)', margin: '2px 0 8px' }}>
-            Finished workers whose worktree held un-integrated work — kept (never auto-discarded) and auto-reclaimed once the work lands in its base branch.
+            {t('workersTab.preservedBlurb', 'Finished workers whose worktree held un-integrated work — kept (never auto-discarded) and auto-reclaimed once the work lands in its base branch.')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {preserved.map((p) => (
@@ -159,8 +162,8 @@ export function WorkersTab() {
                 </div>
                 <div style={metaRow}>
                   <span style={{ wordBreak: 'break-all' }}>{p.wtPath}</span>
-                  <span>base: {p.baseBranch}</span>
-                  <span>kept {relAge(Math.max(0, Date.now() - p.preservedAt))} ago</span>
+                  <span>{t('workersTab.base', 'base: {branch}', { branch: p.baseBranch })}</span>
+                  <span>{t('workersTab.keptAgo', 'kept {age} ago', { age: relAge(Math.max(0, Date.now() - p.preservedAt)) })}</span>
                 </div>
               </div>
             ))}

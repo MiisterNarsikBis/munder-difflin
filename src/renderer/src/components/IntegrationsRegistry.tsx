@@ -11,6 +11,7 @@ import {
   type IntegrationTemplate,
   type TestResult
 } from '@/integrations/registryClient';
+import { useT } from '@/i18n';
 
 // Integrations configuration UI — Settings → Integrations. Conformed to Jim's
 // spec v1 (hive/docs/integrations-spec.md) and styled to Pam's mockup
@@ -94,6 +95,7 @@ function draftFromRecord(r: IntegrationRecordView): Draft {
 }
 
 export function IntegrationsRegistry() {
+  const t = useT();
   const [templates, setTemplates] = useState<IntegrationTemplate[]>([]);
   const [records, setRecords] = useState<IntegrationRecordView[]>([]);
 
@@ -126,23 +128,23 @@ export function IntegrationsRegistry() {
   const goList = () => { setView('list'); setDraft(null); setPicked(''); setReplacing(false); setShowSecret(false); setCfgTest(null); setErr(''); };
   const startAdd = () => { setPicked(''); setErr(''); setView('gallery'); };
   const continueFromGallery = () => {
-    const t = templates.find((x) => x.idSuggestion === picked);
-    if (!t) return;
-    setDraft(draftFromTemplate(t, Date.now())); setReplacing(false); setShowSecret(false); setCfgTest(null); setErr(''); setView('configure');
+    const tpl = templates.find((x) => x.idSuggestion === picked);
+    if (!tpl) return;
+    setDraft(draftFromTemplate(tpl, Date.now())); setReplacing(false); setShowSecret(false); setCfgTest(null); setErr(''); setView('configure');
   };
   const startEdit = (r: IntegrationRecordView) => { setDraft(draftFromRecord(r)); setReplacing(false); setShowSecret(false); setCfgTest(null); setErr(''); setView('configure'); };
 
   const patch = (p: Partial<Draft>) => setDraft((d) => (d ? { ...d, ...p } : d));
 
   const validate = (d: Draft): string | null => {
-    if (!d.label.trim()) return 'Give it a label.';
-    if (!slugify(d.id || d.label)) return 'Could not derive a valid id from the label.';
+    if (!d.label.trim()) return t('integrationsRegistry.validate.giveLabel', 'Give it a label.');
+    if (!slugify(d.id || d.label)) return t('integrationsRegistry.validate.badId', 'Could not derive a valid id from the label.');
     if (d.kind === 'custom-rest') {
       const u = d.baseUrl.trim();
-      if (!u) return 'Base URL is required.';
-      if (!/^https:\/\//.test(u) && !/^http:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?(\/|$)/.test(u)) return 'Base URL must be https:// (or http://127.0.0.1 / localhost for a local target).';
+      if (!u) return t('integrationsRegistry.validate.baseUrlRequired', 'Base URL is required.');
+      if (!/^https:\/\//.test(u) && !/^http:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?(\/|$)/.test(u)) return t('integrationsRegistry.validate.baseUrlHttps', 'Base URL must be https:// (or http://127.0.0.1 / localhost for a local target).');
     }
-    if (d.authType === 'header' && !/^[A-Za-z0-9-]{1,64}$/.test(d.authHeader.trim())) return 'Header name must be 1–64 chars of A–Z, 0–9, or "-".';
+    if (d.authType === 'header' && !/^[A-Za-z0-9-]{1,64}$/.test(d.authHeader.trim())) return t('integrationsRegistry.validate.headerName', 'Header name must be 1–64 chars of A–Z, 0–9, or "-".');
     return null;
   };
 
@@ -170,34 +172,36 @@ export function IntegrationsRegistry() {
     try {
       const secret = draft.secret.trim().length > 0 ? draft.secret : undefined;
       const res = await integrationsClient.save(recordFromDraft(draft, Date.now()), secret);
-      if (!res.ok) { setErr(res.error || 'Could not save.'); return; }
+      if (!res.ok) { setErr(res.error || t('integrationsRegistry.couldNotSave', 'Could not save.')); return; }
       await refresh();
-      flash(draft.isNew ? 'Integration added.' : 'Integration updated.');
+      flash(draft.isNew ? t('integrationsRegistry.added', 'Integration added.') : t('integrationsRegistry.updated', 'Integration updated.'));
       goList();
-    } catch { setErr('Could not save.'); }
+    } catch { setErr(t('integrationsRegistry.couldNotSave', 'Could not save.')); }
     finally { setBusy(false); }
   };
 
   const onRemove = async (r: IntegrationRecordView) => {
     setBusy(true);
-    try { await integrationsClient.remove(r.id); setRowTest((m) => { const n = { ...m }; delete n[r.id]; return n; }); await refresh(); flash(`Removed “${r.label}”.`); }
-    catch { flash('Could not remove.'); }
+    try { await integrationsClient.remove(r.id); setRowTest((m) => { const n = { ...m }; delete n[r.id]; return n; }); await refresh(); flash(t('integrationsRegistry.removed', 'Removed "{label}".', { label: r.label })); }
+    catch { flash(t('integrationsRegistry.couldNotRemove', 'Could not remove.')); }
     finally { setBusy(false); }
   };
 
-  const fmtTest = (t: TestResult) => t.ok ? `✓ Connected${t.status ? ` (${t.status})` : ''}` : `✕ ${t.error || 'Failed'}${t.status ? ` (${t.status})` : ''}`;
+  const fmtTest = (result: TestResult) => result.ok
+    ? t('integrationsRegistry.test.connected', '✓ Connected{status}', { status: result.status ? ` (${result.status})` : '' })
+    : t('integrationsRegistry.test.failed', '✕ {error}{status}', { error: result.error || t('integrationsRegistry.test.failedDefault', 'Failed'), status: result.status ? ` (${result.status})` : '' });
 
   const onTestRow = async (r: IntegrationRecordView) => {
     setTestingId(r.id);
     try { const res = await integrationsClient.test(r.id); setRowTest((m) => ({ ...m, [r.id]: res })); }
-    catch { setRowTest((m) => ({ ...m, [r.id]: { ok: false, error: 'Test failed to run.' } })); }
+    catch { setRowTest((m) => ({ ...m, [r.id]: { ok: false, error: t('integrationsRegistry.testFailedToRun', 'Test failed to run.') } })); }
     finally { setTestingId(null); }
   };
   const onTestCfg = async () => {
     if (!draft || draft.isNew) return;
     setTesting(true); setCfgTest(null);
     try { setCfgTest(await integrationsClient.test(draft.id)); }
-    catch { setCfgTest({ ok: false, error: 'Test failed to run.' }); }
+    catch { setCfgTest({ ok: false, error: t('integrationsRegistry.testFailedToRun', 'Test failed to run.') }); }
     finally { setTesting(false); }
   };
 
@@ -205,33 +209,33 @@ export function IntegrationsRegistry() {
   if (view === 'gallery') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <button type="button" onClick={goList} style={linkBtn}>← Integrations</button>
+        <button type="button" onClick={goList} style={linkBtn}>{t('integrationsRegistry.backToIntegrations', '← Integrations')}</button>
         <div>
-          <div style={{ ...dispLabel, marginBottom: 4 }}>Pick a template</div>
-          <span style={subText}>Choose what you’re connecting. The template sets the defaults. Pick <b>Custom REST</b> for anything not listed.</span>
+          <div style={{ ...dispLabel, marginBottom: 4 }}>{t('integrationsRegistry.pickTemplate', 'Pick a template')}</div>
+          <span style={subText}>{t('integrationsRegistry.pickTemplate.hint1', 'Choose what you’re connecting. The template sets the defaults. Pick')} <b>{t('integrationsRegistry.customRest', 'Custom REST')}</b> {t('integrationsRegistry.pickTemplate.hint2', 'for anything not listed.')}</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-          {templates.map((t) => {
-            const on = picked === t.idSuggestion;
-            const g = glyphFor(t.kind, t.label);
+          {templates.map((tpl) => {
+            const on = picked === tpl.idSuggestion;
+            const g = glyphFor(tpl.kind, tpl.label);
             return (
-              <button key={t.idSuggestion} type="button" onClick={() => setPicked(t.idSuggestion)} style={{
+              <button key={tpl.idSuggestion} type="button" onClick={() => setPicked(tpl.idSuggestion)} style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: 10, textAlign: 'left', cursor: 'pointer', border: 'none',
                 background: on ? 'var(--cth-lemon-light, #FFEC99)' : 'var(--cth-paper-100)',
                 boxShadow: `inset 0 0 0 ${on ? 2 : 1}px ${on ? 'var(--cth-ink-900)' : 'var(--cth-ink-300)'}`
               }}>
                 <Glyph mono={g.mono} bg={g.bg} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, overflowWrap: 'anywhere' }}>
-                  <span style={{ fontSize: 12, lineHeight: '17px', color: 'var(--cth-ink-900)', fontWeight: 600 }}>{t.label}</span>
-                  <span style={hint}>{t.secretHelp || (t.kind === 'custom-rest' ? 'Any HTTP API' : '')}</span>
+                  <span style={{ fontSize: 12, lineHeight: '17px', color: 'var(--cth-ink-900)', fontWeight: 600 }}>{tpl.label}</span>
+                  <span style={hint}>{tpl.secretHelp || (tpl.kind === 'custom-rest' ? t('integrationsRegistry.anyHttpApi', 'Any HTTP API') : '')}</span>
                 </div>
               </button>
             );
           })}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <PixelButton variant="secondary" size="sm" onClick={goList}>cancel</PixelButton>
-          <PixelButton variant="primary" size="sm" onClick={continueFromGallery} disabled={!picked}>continue →</PixelButton>
+          <PixelButton variant="secondary" size="sm" onClick={goList}>{t('common.cancel', 'cancel')}</PixelButton>
+          <PixelButton variant="primary" size="sm" onClick={continueFromGallery} disabled={!picked}>{t('integrationsRegistry.continue', 'continue →')}</PixelButton>
         </div>
       </div>
     );
@@ -241,56 +245,56 @@ export function IntegrationsRegistry() {
   if (view === 'configure' && draft) {
     const g = glyphFor(draft.kind, draft.label);
     const tpl = templates.find((t) => t.kind === draft.kind);
-    const secretLabel = tpl?.secretLabel || 'Secret';
+    const secretLabel = tpl?.secretLabel || t('integrationsRegistry.secretDefault', 'Secret');
     const showSavedPill = !draft.isNew && draft.hasSecret && !replacing;
     const isUsable = usable(draft);
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <button type="button" onClick={draft.isNew ? startAdd : goList} style={linkBtn}>{draft.isNew ? '← Templates' : '← Integrations'}</button>
+        <button type="button" onClick={draft.isNew ? startAdd : goList} style={linkBtn}>{draft.isNew ? t('integrationsRegistry.backToTemplates', '← Templates') : t('integrationsRegistry.backToIntegrations', '← Integrations')}</button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'var(--cth-cream-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)' }}>
           <Glyph mono={g.mono} bg={g.bg} lg />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 13, lineHeight: '18px', fontWeight: 600, color: 'var(--cth-ink-900)' }}>{tpl?.label ?? draft.kind}</span>
-            <span style={hint}>{needsSecret(draft.authType) ? `Needs a ${secretLabel.toLowerCase()}` : 'Public API — no secret needed'}</span>
+            <span style={hint}>{needsSecret(draft.authType) ? t('integrationsRegistry.needsSecret', 'Needs a {secret}', { secret: secretLabel.toLowerCase() }) : t('integrationsRegistry.publicApi', 'Public API — no secret needed')}</span>
           </div>
         </div>
 
         {/* Label */}
         <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <span style={fieldLabel}>Label</span>
-          <input value={draft.label} onChange={(e) => patch({ label: e.target.value, ...(draft.isNew ? { id: slugify(e.target.value) } : {}) })} placeholder={`e.g. ${tpl?.label ?? 'My API'} (prod)`} style={inputStyle} />
-          <span style={hint}>Shown in your list. Id: <code style={{ fontFamily: 'var(--cth-font-mono)' }}>{slugify(draft.id || draft.label) || '—'}</code>{draft.isNew ? '' : ' (fixed)'}</span>
+          <span style={fieldLabel}>{t('integrationsRegistry.label', 'Label')}</span>
+          <input value={draft.label} onChange={(e) => patch({ label: e.target.value, ...(draft.isNew ? { id: slugify(e.target.value) } : {}) })} placeholder={t('integrationsRegistry.labelPlaceholder', 'e.g. {label} (prod)', { label: tpl?.label ?? 'My API' })} style={inputStyle} />
+          <span style={hint}>{t('integrationsRegistry.labelHint', 'Shown in your list. Id:')} <code style={{ fontFamily: 'var(--cth-font-mono)' }}>{slugify(draft.id || draft.label) || '—'}</code>{draft.isNew ? '' : t('integrationsRegistry.fixed', ' (fixed)')}</span>
         </label>
 
         {/* Base URL — editable for custom-rest, fixed for presets */}
         <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <span style={fieldLabel}>Base URL</span>
+          <span style={fieldLabel}>{t('integrationsRegistry.baseUrl', 'Base URL')}</span>
           <input value={draft.baseUrl} onChange={(e) => patch({ baseUrl: e.target.value })} placeholder="https://api.example.com" readOnly={draft.kind !== 'custom-rest'} style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)', opacity: draft.kind !== 'custom-rest' ? 0.7 : 1 }} />
-          {draft.kind !== 'custom-rest' && <span style={hint}>Set by the {tpl?.label ?? 'preset'} template.</span>}
+          {draft.kind !== 'custom-rest' && <span style={hint}>{t('integrationsRegistry.setByTemplate', 'Set by the {template} template.', { template: tpl?.label ?? t('integrationsRegistry.preset', 'preset') })}</span>}
         </label>
 
         {/* Auth type — selectable only for custom-rest */}
         {draft.kind === 'custom-rest' ? (
           <label style={{ display: 'flex', flexDirection: 'column', gap: 5, maxWidth: 260 }}>
-            <span style={fieldLabel}>Authentication</span>
+            <span style={fieldLabel}>{t('integrationsRegistry.authentication', 'Authentication')}</span>
             <select value={draft.authType} onChange={(e) => patch({ authType: e.target.value as IntegrationAuthType })} style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)' }}>
-              {CUSTOM_AUTH.map((a) => <option key={a} value={a}>{AUTH_LABEL[a]}</option>)}
+              {CUSTOM_AUTH.map((a) => <option key={a} value={a}>{t(`integrationsRegistry.authLabel.${a}`, AUTH_LABEL[a])}</option>)}
             </select>
           </label>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <span style={fieldLabel}>Authentication</span>
-            <span style={hint}>{AUTH_LABEL[draft.authType]} (set by template)</span>
+            <span style={fieldLabel}>{t('integrationsRegistry.authentication', 'Authentication')}</span>
+            <span style={hint}>{t(`integrationsRegistry.authLabel.${draft.authType}`, AUTH_LABEL[draft.authType])} {t('integrationsRegistry.setByTemplateShort', '(set by template)')}</span>
           </div>
         )}
 
         {/* Custom header name (header auth only) */}
         {draft.authType === 'header' && (
           <label style={{ display: 'flex', flexDirection: 'column', gap: 5, maxWidth: 320 }}>
-            <span style={fieldLabel}>Header name</span>
+            <span style={fieldLabel}>{t('integrationsRegistry.headerName', 'Header name')}</span>
             <input value={draft.authHeader} onChange={(e) => patch({ authHeader: e.target.value })} placeholder="X-Api-Key" style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)' }} />
-            <span style={hint}>The secret is sent as <code style={{ fontFamily: 'var(--cth-font-mono)' }}>{(draft.authHeader.trim() || 'X-Header')}: &lt;secret&gt;</code>.</span>
+            <span style={hint}>{t('integrationsRegistry.headerSentAs', 'The secret is sent as')} <code style={{ fontFamily: 'var(--cth-font-mono)' }}>{(draft.authHeader.trim() || 'X-Header')}: &lt;secret&gt;</code>.</span>
           </label>
         )}
 
@@ -300,17 +304,17 @@ export function IntegrationsRegistry() {
             <span style={fieldLabel}>{secretLabel}</span>
             {showSavedPill ? (
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--cth-font-mono)', fontSize: 12, color: 'var(--cth-ink-500)', background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)', padding: '6px 10px', letterSpacing: 2 }}>•••••••• saved</span>
-                <PixelButton variant="secondary" size="sm" onClick={() => { setReplacing(true); setShowSecret(false); patch({ secret: '' }); }}>Replace key</PixelButton>
+                <span style={{ fontFamily: 'var(--cth-font-mono)', fontSize: 12, color: 'var(--cth-ink-500)', background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)', padding: '6px 10px', letterSpacing: 2 }}>{t('integrationsRegistry.saved', '•••••••• saved')}</span>
+                <PixelButton variant="secondary" size="sm" onClick={() => { setReplacing(true); setShowSecret(false); patch({ secret: '' }); }}>{t('integrationsRegistry.replaceKey', 'Replace key')}</PixelButton>
               </div>
             ) : (
               <>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <input type={showSecret ? 'text' : 'password'} value={draft.secret} onChange={(e) => patch({ secret: e.target.value })} placeholder={`Paste your ${secretLabel.toLowerCase()}`} autoComplete="off" style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)' }} />
-                  <PixelButton variant="secondary" size="sm" onClick={() => setShowSecret((s) => !s)} disabled={!draft.secret}>{showSecret ? 'hide' : 'show'}</PixelButton>
+                  <input type={showSecret ? 'text' : 'password'} value={draft.secret} onChange={(e) => patch({ secret: e.target.value })} placeholder={t('integrationsRegistry.pasteSecret', 'Paste your {secret}', { secret: secretLabel.toLowerCase() })} autoComplete="off" style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)' }} />
+                  <PixelButton variant="secondary" size="sm" onClick={() => setShowSecret((s) => !s)} disabled={!draft.secret}>{showSecret ? t('settingsModal.connections.webhooks.hide', 'hide') : t('settingsModal.connections.webhooks.show', 'show')}</PixelButton>
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', padding: '7px 9px', background: 'var(--cth-cream-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-100, var(--cth-ink-300))', ...hint }}>
-                  🔒&nbsp;<span><b style={{ color: 'var(--cth-ink-700)' }}>Write-only.</b> Encrypted in the main process and never shown again. To change it, paste a new key — the old one can’t be read back.{!draft.isNew && draft.hasSecret ? ' Leave blank to keep the saved key.' : ''}</span>
+                  🔒&nbsp;<span><b style={{ color: 'var(--cth-ink-700)' }}>{t('integrationsRegistry.writeOnly', 'Write-only.')}</b> {t('integrationsRegistry.writeOnlyDetail', 'Encrypted in the main process and never shown again. To change it, paste a new key — the old one can’t be read back.')}{!draft.isNew && draft.hasSecret ? ' ' + t('integrationsRegistry.leaveBlank', 'Leave blank to keep the saved key.') : ''}</span>
                 </div>
                 {tpl?.secretHelp && <span style={hint}>{tpl.secretHelp}</span>}
               </>
@@ -320,28 +324,28 @@ export function IntegrationsRegistry() {
 
         {/* Enabled gate + worker availability */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={fieldLabel}>Availability</span>
+          <span style={fieldLabel}>{t('integrationsRegistry.availability', 'Availability')}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <PixelButton variant={draft.enabled ? 'primary' : 'secondary'} size="sm" onClick={() => patch({ enabled: !draft.enabled })}>{draft.enabled ? 'enabled' : 'disabled'}</PixelButton>
-            <span style={hint}>{isUsable ? 'Available to all workers.' : needsSecret(draft.authType) && !(draft.hasSecret || draft.secret.trim()) ? 'Add a secret and enable to make it available.' : draft.enabled ? 'Ready once saved.' : 'Disabled — no worker can use it.'}</span>
+            <PixelButton variant={draft.enabled ? 'primary' : 'secondary'} size="sm" onClick={() => patch({ enabled: !draft.enabled })}>{draft.enabled ? t('integrationsRegistry.enabled', 'enabled') : t('integrationsRegistry.disabled', 'disabled')}</PixelButton>
+            <span style={hint}>{isUsable ? t('integrationsRegistry.availableToAll', 'Available to all workers.') : needsSecret(draft.authType) && !(draft.hasSecret || draft.secret.trim()) ? t('integrationsRegistry.addSecretToEnable', 'Add a secret and enable to make it available.') : draft.enabled ? t('integrationsRegistry.readyOnceSaved', 'Ready once saved.') : t('integrationsRegistry.disabledNoWorker', 'Disabled — no worker can use it.')}</span>
           </div>
-          <span style={hint}>v1 grants every enabled integration to all workers. Per-worker scoping is coming.</span>
+          <span style={hint}>{t('integrationsRegistry.v1Grants', 'v1 grants every enabled integration to all workers. Per-worker scoping is coming.')}</span>
         </div>
 
         {/* Test connection (saved integrations only — broker probes by id) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <span style={fieldLabel}>Test connection</span>
+          <span style={fieldLabel}>{t('integrationsRegistry.testConnection', 'Test connection')}</span>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <PixelButton variant="secondary" size="sm" onClick={() => { void onTestCfg(); }} disabled={draft.isNew || testing}>{testing ? 'testing…' : 'Test connection'}</PixelButton>
+            <PixelButton variant="secondary" size="sm" onClick={() => { void onTestCfg(); }} disabled={draft.isNew || testing}>{testing ? t('integrationsRegistry.testing', 'testing…') : t('integrationsRegistry.testConnection', 'Test connection')}</PixelButton>
             {cfgTest && <span style={{ fontSize: 12, color: cfgTest.ok ? 'var(--cth-mint-700, #1f7a4d)' : 'var(--cth-danger, #6E1423)' }}>{fmtTest(cfgTest)}</span>}
           </div>
-          <span style={hint}>{draft.isNew ? 'Save the integration first, then test the live connection.' : 'Runs a live read-only probe against the base URL with the stored secret.'}</span>
+          <span style={hint}>{draft.isNew ? t('integrationsRegistry.saveFirstHint', 'Save the integration first, then test the live connection.') : t('integrationsRegistry.liveProbeHint', 'Runs a live read-only probe against the base URL with the stored secret.')}</span>
         </div>
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
           {(err || note) && <span style={{ marginRight: 'auto', fontSize: 12, color: err ? 'var(--cth-danger, #6E1423)' : 'var(--cth-ink-500)' }}>{err || note}</span>}
-          <PixelButton variant="secondary" size="sm" onClick={goList} disabled={busy}>cancel</PixelButton>
-          <PixelButton variant="primary" size="sm" onClick={() => { void onSave(); }} disabled={busy}>{busy ? '…' : draft.isNew ? 'Save integration' : 'Save changes'}</PixelButton>
+          <PixelButton variant="secondary" size="sm" onClick={goList} disabled={busy}>{t('common.cancel', 'cancel')}</PixelButton>
+          <PixelButton variant="primary" size="sm" onClick={() => { void onSave(); }} disabled={busy}>{busy ? '…' : draft.isNew ? t('integrationsRegistry.saveIntegration', 'Save integration') : t('integrationsRegistry.saveChanges', 'Save changes')}</PixelButton>
         </div>
       </div>
     );
@@ -353,29 +357,35 @@ export function IntegrationsRegistry() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={dispLabel}>Integrations</div>
-          <span style={{ ...subText, maxWidth: 440 }}>Connect outside tools so your agents can read and act on them. Secrets are stored encrypted in the main process and never shown again.</span>
+          <div style={dispLabel}>{t('integrationsRegistry.title', 'Integrations')}</div>
+          <span style={{ ...subText, maxWidth: 440 }}>{t('integrationsRegistry.intro', 'Connect outside tools so your agents can read and act on them. Secrets are stored encrypted in the main process and never shown again.')}</span>
         </div>
-        {records.length > 0 && <PixelButton variant="primary" size="sm" onClick={startAdd} disabled={busy || templates.length === 0}>+ add integration</PixelButton>}
+        {records.length > 0 && <PixelButton variant="primary" size="sm" onClick={startAdd} disabled={busy || templates.length === 0}>{t('integrationsRegistry.addIntegration', '+ add integration')}</PixelButton>}
       </div>
 
       {records.length === 0 ? (
         <div style={{ padding: 24, textAlign: 'center', background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)' }}>
-          <p style={{ margin: '0 0 12px', fontSize: 12, lineHeight: '18px', color: 'var(--cth-ink-500)' }}>No integrations yet. Connect GitHub or a custom REST API so your agents can use it.</p>
-          <PixelButton variant="primary" size="sm" onClick={startAdd} disabled={templates.length === 0}>+ add your first integration</PixelButton>
+          <p style={{ margin: '0 0 12px', fontSize: 12, lineHeight: '18px', color: 'var(--cth-ink-500)' }}>{t('integrationsRegistry.emptyHint', 'No integrations yet. Connect GitHub or a custom REST API so your agents can use it.')}</p>
+          <PixelButton variant="primary" size="sm" onClick={startAdd} disabled={templates.length === 0}>{t('integrationsRegistry.addFirstIntegration', '+ add your first integration')}</PixelButton>
         </div>
       ) : (
         <>
-          <span style={hint}>{records.length} integration{records.length === 1 ? '' : 's'} · {usableCount} available to workers</span>
+          <span style={hint}>
+            {records.length === 1
+              ? t('integrationsRegistry.countOne', '{n} integration', { n: records.length })
+              : t('integrationsRegistry.countMany', '{n} integrations', { n: records.length })}
+            {' · '}
+            {t('integrationsRegistry.availableToWorkers', '{n} available to workers', { n: usableCount })}
+          </span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {records.map((r) => {
               const g = glyphFor(r.kind, r.label);
-              const tpl = templates.find((t) => t.kind === r.kind);
+              const tpl = templates.find((x) => x.kind === r.kind);
               const st = !r.enabled
-                ? { dot: '○', color: 'var(--cth-ink-500)', text: 'Disabled' }
+                ? { dot: '○', color: 'var(--cth-ink-500)', text: t('integrationsRegistry.disabled', 'disabled') }
                 : needsSecret(r.authType) && !r.hasSecret
-                  ? { dot: '▲', color: 'var(--cth-danger, #6E1423)', text: 'Needs secret' }
-                  : { dot: '●', color: 'var(--cth-mint-700, #1f7a4d)', text: 'Enabled' };
+                  ? { dot: '▲', color: 'var(--cth-danger, #6E1423)', text: t('integrationsRegistry.needsSecretShort', 'Needs secret') }
+                  : { dot: '●', color: 'var(--cth-mint-700, #1f7a4d)', text: t('integrationsRegistry.enabled', 'enabled') };
               const rt = rowTest[r.id];
               return (
                 <div key={r.id} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 10, background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)' }}>
@@ -387,14 +397,14 @@ export function IntegrationsRegistry() {
                     </div>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: st.color, whiteSpace: 'nowrap' }}><span style={{ fontSize: 10 }}>{st.dot}</span> {st.text}</span>
                     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                      <PixelButton variant="secondary" size="sm" onClick={() => { void onTestRow(r); }} disabled={busy || testingId === r.id}>{testingId === r.id ? '…' : 'test'}</PixelButton>
-                      <PixelButton variant="ghost" size="sm" onClick={() => startEdit(r)} disabled={busy}>edit</PixelButton>
+                      <PixelButton variant="secondary" size="sm" onClick={() => { void onTestRow(r); }} disabled={busy || testingId === r.id}>{testingId === r.id ? '…' : t('integrationsRegistry.test', 'test')}</PixelButton>
+                      <PixelButton variant="ghost" size="sm" onClick={() => startEdit(r)} disabled={busy}>{t('integrationsRegistry.edit', 'edit')}</PixelButton>
                       <PixelButton variant="ghost" size="sm" onClick={() => { void onRemove(r); }} disabled={busy}>✕</PixelButton>
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ ...hint, color: usable(r) ? 'var(--cth-mint-700, #1f7a4d)' : 'var(--cth-ink-500)' }}>
-                      {usable(r) ? '✓ Available to all workers' : 'Not available to workers yet'}
+                      {usable(r) ? t('integrationsRegistry.availableToAllShort', '✓ Available to all workers') : t('integrationsRegistry.notAvailableYet', 'Not available to workers yet')}
                     </span>
                     {rt && <span style={{ fontSize: 12, color: rt.ok ? 'var(--cth-mint-700, #1f7a4d)' : 'var(--cth-danger, #6E1423)' }}>· {fmtTest(rt)}</span>}
                   </div>

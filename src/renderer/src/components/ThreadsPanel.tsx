@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PixelPanel } from './PixelPanel';
 import { PixelButton } from './PixelButton';
+import { useT, t as translate } from '@/i18n';
 
 // Derive the message shape from the preload-exposed API so the renderer never
 // reaches across project boundaries for a type (window.cth is globally typed).
@@ -36,7 +37,7 @@ function groupThreads(msgs: HiveMessage[]): Thread[] {
   return [...by.entries()]
     .map(([conversation, list]) => {
       const sorted = [...list].sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
-      return { conversation, subject: sorted[0]?.subject || '(no subject)', messages: sorted };
+      return { conversation, subject: sorted[0]?.subject || translate('threadsPanel.noSubject', '(no subject)'), messages: sorted };
     })
     .sort((a, b) => {
       const la = a.messages[a.messages.length - 1].created_at;
@@ -46,6 +47,7 @@ function groupThreads(msgs: HiveMessage[]): Thread[] {
 }
 
 export function ThreadsPanel({ agentId }: ThreadsPanelProps) {
+  const t = useT();
   const [messages, setMessages] = useState<HiveMessage[]>([]);
   const [openThreads, setOpenThreads] = useState<Record<string, boolean>>({});
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -80,7 +82,7 @@ export function ThreadsPanel({ agentId }: ThreadsPanelProps) {
     return (
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'var(--cth-paper-200)' }}>
         <p style={{ margin: 0, fontSize: 13, color: 'var(--cth-ink-700)', textAlign: 'center', maxWidth: 280 }}>
-          No conversations yet. Messages this agent receives will appear here as threads.
+          {t('threadsPanel.empty', 'No conversations yet. Messages this agent receives will appear here as threads.')}
         </p>
       </div>
     );
@@ -134,7 +136,7 @@ export function ThreadsPanel({ agentId }: ThreadsPanelProps) {
                           <button
                             onClick={() => setExpanded(s => ({ ...s, [m.id]: !isExp }))}
                             style={{ marginLeft: 6, border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--cth-sky)', fontFamily: 'var(--cth-font-ui)', fontSize: 12, padding: 0 }}
-                          >{isExp ? 'less' : 'more'}</button>
+                          >{isExp ? t('threadsPanel.less', 'less') : t('threadsPanel.more', 'more')}</button>
                         )}
                       </div>
                     </div>
@@ -145,7 +147,7 @@ export function ThreadsPanel({ agentId }: ThreadsPanelProps) {
                   <textarea
                     value={drafts[thread.conversation] ?? ''}
                     onChange={e => setDrafts(d => ({ ...d, [thread.conversation]: e.target.value }))}
-                    placeholder={`Reply to ${last.from}…`}
+                    placeholder={t('threadsPanel.replyTo', 'Reply to {name}…', { name: last.from })}
                     rows={2}
                     style={{
                       resize: 'vertical', width: '100%', boxSizing: 'border-box', padding: '6px 8px',
@@ -156,7 +158,7 @@ export function ThreadsPanel({ agentId }: ThreadsPanelProps) {
                   />
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <PixelButton size="sm" onClick={() => sendReply(last)} disabled={!(drafts[thread.conversation] ?? '').trim()}>
-                      Send
+                      {t('threadsPanel.send', 'Send')}
                     </PixelButton>
                   </div>
                 </div>
