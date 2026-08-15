@@ -1007,5 +1007,50 @@ export const FR: Record<string, string> = {
   'agentControlStrip.haltingEllipsis': 'arrêt en cours…',
   'agentControlStrip.steerQueuedCount': '{n} orientation(s) en file',
   'agentControlStrip.steerPlaceholder': 'orienter cet agent (injecté comme contexte, sans taper dans son terminal)…',
-  'agentControlStrip.steer': 'orienter'
+  'agentControlStrip.steer': 'orienter',
+
+  // ── components/git/CommitGraph.tsx ────────────────────────────────────────
+  'commitGraph.unit.s': 's',
+  'commitGraph.unit.m': 'min',
+  'commitGraph.unit.h': 'h',
+  'commitGraph.unit.d': 'j',
+  'commitGraph.unit.mo': 'mo',
+  'commitGraph.authorAgo': 'il y a {age} · {author}',
+
+  // ── components/PtyTerminalView.tsx ────────────────────────────────────────
+  'ptyTerminalView.livePty': 'en direct · pty {id}',
+  'ptyTerminalView.zoomOut': 'Zoom arrière (Cmd -)',
+  'ptyTerminalView.resetZoom': 'Réinitialiser le zoom (Cmd 0)',
+  'ptyTerminalView.zoomIn': 'Zoom avant (Cmd +)',
+  'ptyTerminalView.exitFullscreen': 'Quitter le plein écran (Échap)',
+
+  // ── components/RealtimeMichaelToggle.tsx ──────────────────────────────────
+  'realtimeMichaelToggle.needsKey': 'Parler nécessite votre clé API OpenAI (utilisée pour l’API vocale Realtime). Ajoutez-la dans Réglages → Voix.',
+  'realtimeMichaelToggle.whyDisabled': 'Pourquoi Parler est-il désactivé ?',
+  'realtimeMichaelToggle.needsKeyHint': 'Une clé API OpenAI est nécessaire pour utiliser cette fonctionnalité.',
+  'realtimeMichaelToggle.setItUpNow': 'configurer maintenant',
+  'realtimeMichaelToggle.label.off': 'parler',
+  'realtimeMichaelToggle.label.connecting': '…',
+  'realtimeMichaelToggle.label.listening': 'écoute',
+  'realtimeMichaelToggle.label.responding': 'parle',
+  'realtimeMichaelToggle.label.working': 'travail',
+  'realtimeMichaelToggle.help.off': 'Parler à Michael — démarrer la session vocale',
+  'realtimeMichaelToggle.help.connecting': 'Connexion à Michael…',
+  'realtimeMichaelToggle.help.listening': 'Écoute — Michael vous entend (cliquez pour arrêter)',
+  'realtimeMichaelToggle.help.responding': 'Michael parle (cliquez pour arrêter)',
+  'realtimeMichaelToggle.help.working': 'Michael exécute un outil — micro coupé (cliquez pour arrêter)',
+
+  // ── components/CodeEditor.tsx ─────────────────────────────────────────────
+  'codeEditor.noFileOpen': 'Aucun fichier ouvert',
+  'codeEditor.pickFileHint': 'Choisissez un fichier dans l’arborescence pour l’afficher ici.',
+  'codeEditor.copyAbsolutePath': 'Copier le chemin absolu',
+  'codeEditor.copyPath': 'copier le chemin',
+  'codeEditor.saveCmdS': 'Enregistrer (Cmd-S)',
+  'codeEditor.saved': 'enregistré',
+  'codeEditor.err': 'erreur',
+  'codeEditor.save': 'enregistrer',
+  'codeEditor.exitFullscreen': 'Quitter le plein écran (Échap)',
+  'codeEditor.fullscreen': 'Plein écran',
+  'codeEditor.loadingEllipsis': 'chargement…',
+  'codeEditor.exitFullscreenLabel': 'quitter le plein écran'
 };

@@ -22,17 +22,21 @@ import { PixelButton } from './PixelButton';
 import { Icon } from './Icon';
 import { useStore } from '@/store/store';
 import { useRealtimeMichael, type RealtimeStatus } from '@/realtime/session';
+import { useT } from '@/i18n';
 
 /** Per-status presentation: button variant, short label, dot color, and (optional)
- *  animation for the live-state indicator dot. Maps hook.status → visuals. */
+ *  animation for the live-state indicator dot. Maps hook.status → visuals. Label/help
+ *  are i18n keys resolved via t() in the component (this map can't call hooks). */
 const STATE_VIEW: Record<
   RealtimeStatus,
   {
     variant: 'primary' | 'secondary' | 'destructive';
-    label: string;
+    labelKey: string;
+    labelEn: string;
     dot: string;
     anim?: string;
-    help: string;
+    helpKey: string;
+    helpEn: string;
     /** When live, the button fill — a distinct accent so the active mic never
      *  reads as a flat black 'primary' button. (working uses the destructive
      *  coral variant, already non-black, so it needs no override.) */
@@ -41,39 +45,39 @@ const STATE_VIEW: Record<
 > = {
   off: {
     variant: 'secondary',
-    label: 'talk',
+    labelKey: 'realtimeMichaelToggle.label.off', labelEn: 'talk',
     dot: 'var(--cth-ink-300)',
-    help: 'Talk to Michael — start the voice session'
+    helpKey: 'realtimeMichaelToggle.help.off', helpEn: 'Talk to Michael — start the voice session'
   },
   connecting: {
     variant: 'secondary',
-    label: '…',
+    labelKey: 'realtimeMichaelToggle.label.connecting', labelEn: '…',
     dot: 'var(--cth-lemon)',
     anim: 'cth-blink 700ms steps(2, end) infinite',
-    help: 'Connecting to Michael…'
+    helpKey: 'realtimeMichaelToggle.help.connecting', helpEn: 'Connecting to Michael…'
   },
   listening: {
     variant: 'primary',
-    label: 'listening',
+    labelKey: 'realtimeMichaelToggle.label.listening', labelEn: 'listening',
     dot: 'var(--cth-mint)',
     anim: 'cth-pulse 1000ms steps(2, end) infinite',
-    help: 'Listening — Michael is hearing you (click to stop)',
+    helpKey: 'realtimeMichaelToggle.help.listening', helpEn: 'Listening — Michael is hearing you (click to stop)',
     activeBg: 'var(--cth-mint)'
   },
   responding: {
     variant: 'primary',
-    label: 'speaking',
+    labelKey: 'realtimeMichaelToggle.label.responding', labelEn: 'speaking',
     dot: 'var(--cth-sky)',
     anim: 'cth-pulse 600ms steps(2, end) infinite',
-    help: 'Michael is speaking (click to stop)',
+    helpKey: 'realtimeMichaelToggle.help.responding', helpEn: 'Michael is speaking (click to stop)',
     activeBg: 'var(--cth-sky)'
   },
   working: {
     variant: 'destructive',
-    label: 'working',
+    labelKey: 'realtimeMichaelToggle.label.working', labelEn: 'working',
     dot: 'var(--cth-coral)',
     anim: 'cth-blink 500ms steps(2, end) infinite',
-    help: 'Michael is running a tool — mic muted (click to stop)'
+    helpKey: 'realtimeMichaelToggle.help.working', helpEn: 'Michael is running a tool — mic muted (click to stop)'
   }
 };
 
@@ -83,6 +87,7 @@ export interface RealtimeMichaelToggleProps {
 }
 
 export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggleProps) {
+  const t = useT();
   const hasOpenAiKey = useStore((s) => s.hasOpenAiKey);
   const { status, error, connect, disconnect } = useRealtimeMichael();
   // Measured viewport coords, not a CSS offset. The agent dock clips its
@@ -95,7 +100,8 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
   const panelRef = useRef<HTMLDivElement | null>(null);
   const hintOpen = hint !== null;
 
-  const view = STATE_VIEW[status];
+  const rawView = STATE_VIEW[status];
+  const view = { ...rawView, label: t(rawView.labelKey, rawView.labelEn), help: t(rawView.helpKey, rawView.helpEn) };
   const noKey = !hasOpenAiKey;
 
   // Without a BYOK OpenAI key: stay visible but disabled (matches FreeFlowButton).
@@ -104,7 +110,7 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
   // The tooltip carries the full WHY; the quiet info affordance below gives a
   // discoverable cue so the user never just hits a silently-dead button.
   const title = noKey
-    ? 'Talk needs your OpenAI API key (used for the Realtime voice API). Add it in Settings → Voice.'
+    ? t('realtimeMichaelToggle.needsKey', 'Talk needs your OpenAI API key (used for the Realtime voice API). Add it in Settings → Voice.')
     : error
       ? `${view.help} — ${error}`
       : view.help;
@@ -155,10 +161,10 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
   useEffect(() => {
     if (!hintOpen) return;
     const onDown = (ev: globalThis.MouseEvent): void => {
-      const t = ev.target as Node;
+      const target = ev.target as Node;
       // The popover is portalled out of this subtree, so an inside-click has to
       // be tested against BOTH the anchor and the floating panel.
-      if (hintRef.current?.contains(t) || panelRef.current?.contains(t)) return;
+      if (hintRef.current?.contains(target) || panelRef.current?.contains(target)) return;
       setHint(null);
     };
     const onKey = (ev: KeyboardEvent): void => { if (ev.key === 'Escape') setHint(null); };
@@ -216,7 +222,7 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
           <Icon name="mic" />
           {!compact && (
             <span style={{ fontFamily: 'var(--cth-font-ui)' }}>
-              {noKey ? 'talk' : view.label}
+              {noKey ? t('realtimeMichaelToggle.label.off', 'talk') : view.label}
             </span>
           )}
         </span>
@@ -235,7 +241,7 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
           <button
             ref={iconRef}
             type="button"
-            aria-label="Why is Talk disabled?"
+            aria-label={t('realtimeMichaelToggle.whyDisabled', 'Why is Talk disabled?')}
             aria-expanded={hintOpen}
             onClick={toggleHint}
             style={{
@@ -276,7 +282,7 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
                 whiteSpace: 'normal'
               }}
             >
-              <span>An <strong>OpenAI API key</strong> is needed to use this feature.</span>
+              <span>{t('realtimeMichaelToggle.needsKeyHint', 'An OpenAI API key is needed to use this feature.')}</span>
               <button
                 type="button"
                 onClick={openKeySettings}
@@ -287,7 +293,7 @@ export function RealtimeMichaelToggle({ compact = false }: RealtimeMichaelToggle
                   color: 'var(--cth-ink-900)', textDecoration: 'underline'
                 }}
               >
-                set it up now
+                {t('realtimeMichaelToggle.setItUpNow', 'set it up now')}
               </button>
             </div>,
             document.body

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { layoutGraph, LANE_COLORS } from './graph';
+import { useT, t as translate } from '@/i18n';
 
 /**
  * Commit history — lane rail + one line per commit.
@@ -56,11 +57,11 @@ const BEND = 8;
 
 function relTime(ms: number): string {
   const delta = Math.max(0, Date.now() / 1000 - ms / 1000);
-  if (delta < 60) return `${Math.round(delta)}s`;
-  if (delta < 3600) return `${Math.round(delta / 60)}m`;
-  if (delta < 86400) return `${Math.round(delta / 3600)}h`;
-  if (delta < 86400 * 30) return `${Math.round(delta / 86400)}d`;
-  return `${Math.round(delta / (86400 * 30))}mo`;
+  if (delta < 60) return `${Math.round(delta)}` + translate('commitGraph.unit.s', 's');
+  if (delta < 3600) return `${Math.round(delta / 60)}` + translate('commitGraph.unit.m', 'm');
+  if (delta < 86400) return `${Math.round(delta / 3600)}` + translate('commitGraph.unit.h', 'h');
+  if (delta < 86400 * 30) return `${Math.round(delta / 86400)}` + translate('commitGraph.unit.d', 'd');
+  return `${Math.round(delta / (86400 * 30))}` + translate('commitGraph.unit.mo', 'mo');
 }
 
 /** Strip git's decoration noise down to something chip-sized. */
@@ -75,6 +76,7 @@ function cleanRefs(refs: string[]): string[] {
 }
 
 export function CommitGraph({ commits, currentBranch, onCommitClick }: CommitGraphProps) {
+  const t = useT();
   const { rows, railW, rowIndex } = useMemo(() => {
     const layout = layoutGraph(commits.map((c) => ({ sha: c.sha, parents: c.parents })));
     const idx = new Map<string, number>();
@@ -157,7 +159,7 @@ export function CommitGraph({ commits, currentBranch, onCommitClick }: CommitGra
           <div
             key={c.sha}
             onClick={onCommitClick ? () => onCommitClick(c.sha) : undefined}
-            title={`${c.shortSha} · ${c.subject}\n${c.author} · ${relTime(c.time * 1000)} ago`}
+            title={`${c.shortSha} · ${c.subject}\n` + t('commitGraph.authorAgo', '{author} · {age} ago', { author: c.author, age: relTime(c.time * 1000) })}
             style={{
               height: ROW_H,
               display: 'flex',
