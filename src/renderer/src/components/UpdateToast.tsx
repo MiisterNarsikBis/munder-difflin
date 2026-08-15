@@ -13,6 +13,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/Icon';
+import { useT } from '@/i18n';
 import type { UpdateStatus } from '@shared/updateState';
 
 /** The toast is the LOUD half — it only interrupts for the two states a user has
@@ -25,6 +26,7 @@ function toastable(s: UpdateStatus): ToastStatus | null {
 }
 
 export function UpdateToast() {
+  const t = useT();
   const [status, setStatus] = useState<ToastStatus | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -67,32 +69,32 @@ export function UpdateToast() {
         <Icon name="sparkle" />
         <span style={{ fontSize: 13, color: 'var(--cth-ink-900)', fontWeight: 600 }}>
           {status.state === 'downloaded'
-            ? `Update v${status.version} downloaded`
-            : `v${status.version} is available`}
+            ? t('updateToast.downloadedHeadline', 'Update v{version} downloaded', { version: status.version })
+            : t('updateToast.availableHeadline', 'v{version} is available', { version: status.version })}
         </span>
       </div>
       <span style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-700)' }}>
         {status.state === 'downloaded'
-          ? 'Restart Munder Difflin whenever you like to apply it — nothing restarts on its own.'
-          : 'This install can’t update itself — grab the new build from the releases page.'}
+          ? t('updateToast.downloadedDetail', 'Restart Munder Difflin whenever you like to apply it — nothing restarts on its own.')
+          : t('updateToast.availableDetail', 'This install can’t update itself — grab the new build from the releases page.')}
       </span>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
         <button
           onClick={() => setStatus(null)}
           style={{ ...buttonStyle, background: 'var(--cth-cream-100)' }}
         >
-          later
+          {t('updateToast.later', 'later')}
         </button>
         {status.state === 'downloaded' ? (
           <button onClick={restart} disabled={busy} style={buttonStyle}>
-            {busy ? 'restarting…' : 'restart to update'}
+            {busy ? t('updateToast.restarting', 'restarting…') : t('updateToast.restartToUpdate', 'restart to update')}
           </button>
         ) : (
           <button
             onClick={() => { void window.cth.updateOpenRelease(status.url); }}
             style={buttonStyle}
           >
-            open releases
+            {t('updateToast.openReleases', 'open releases')}
           </button>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { useAgentSpans, useFleetTelemetry, totalTokens, cacheFraction } from '@/hooks/useTelemetry';
+import { useT } from '@/i18n';
 
 /**
  * Per-agent tool-call timeline (#7B.2) — a horizontal waterfall of tool spans
@@ -8,6 +9,7 @@ import { useAgentSpans, useFleetTelemetry, totalTokens, cacheFraction } from '@/
  * the headline upgrade over the old bare tool-count proxy.
  */
 export function ToolWaterfall({ agentId }: { agentId: string }) {
+  const t = useT();
   const spans = useAgentSpans(agentId);
   const { samples } = useFleetTelemetry();
   const sample = samples[agentId];
@@ -28,16 +30,16 @@ export function ToolWaterfall({ agentId }: { agentId: string }) {
           <>
             <span><strong>${sample.usd.toFixed(2)}</strong></span>
             <span style={{ color: 'var(--cth-ink-700)' }}>
-              fresh {fmtTokens(sample.input + sample.cacheCreation)}t
+              {t('toolWaterfall.fresh', 'fresh {n}t', { n: fmtTokens(sample.input + sample.cacheCreation) })}
             </span>
             <span style={{ color: 'var(--cth-sky)' }}>
-              cache {fmtTokens(sample.cacheRead)}t ({Math.round(cacheFraction(sample) * 100)}%)
+              {t('toolWaterfall.cache', 'cache {n}t ({pct}%)', { n: fmtTokens(sample.cacheRead), pct: Math.round(cacheFraction(sample) * 100) })}
             </span>
             {sample.model && <span style={{ color: 'var(--cth-ink-500)' }}>{sample.model}</span>}
-            <span style={{ color: 'var(--cth-ink-500)' }}>{fmtTokens(totalTokens(sample))}t total</span>
+            <span style={{ color: 'var(--cth-ink-500)' }}>{t('toolWaterfall.total', '{n}t total', { n: fmtTokens(totalTokens(sample)) })}</span>
           </>
         ) : (
-          <span style={{ color: 'var(--cth-ink-500)' }}>no live telemetry yet — spawn / respawn this agent to instrument it</span>
+          <span style={{ color: 'var(--cth-ink-500)' }}>{t('toolWaterfall.noTelemetry', 'no live telemetry yet — spawn / respawn this agent to instrument it')}</span>
         )}
       </div>
 
@@ -45,7 +47,7 @@ export function ToolWaterfall({ agentId }: { agentId: string }) {
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 10 }}>
         {recent.length === 0 && (
           <div style={{ fontSize: 12, color: 'var(--cth-ink-500)' }}>
-            No tool calls captured yet. Each tool the agent runs appears here with its real duration.
+            {t('toolWaterfall.noToolCalls', 'No tool calls captured yet. Each tool the agent runs appears here with its real duration.')}
           </div>
         )}
         {recent.map((s, i) => {
@@ -58,7 +60,7 @@ export function ToolWaterfall({ agentId }: { agentId: string }) {
               </span>
               <div style={{ flex: 1, height: 12, background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)' }}>
                 <div
-                  title={s.error ? `${s.tool}: ${s.error}` : `${s.tool} · ${s.durationMs}ms · ${ok ? 'ok' : 'failed'}`}
+                  title={s.error ? `${s.tool}: ${s.error}` : `${s.tool} · ${s.durationMs}ms · ${ok ? t('toolWaterfall.ok', 'ok') : t('toolWaterfall.failed', 'failed')}`}
                   style={{ width: `${pct}%`, height: '100%', background: ok ? 'var(--cth-mint)' : 'var(--cth-coral)' }}
                 />
               </div>

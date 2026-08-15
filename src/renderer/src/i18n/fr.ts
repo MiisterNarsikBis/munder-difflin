@@ -890,5 +890,85 @@ export const FR: Record<string, string> = {
   'costHud.overCap': 'Plafond de dépense dépassé — il est temps de conclure.',
   'costHud.nearCap': 'Vous approchez du plafond de dépense.',
   'costHud.lastSession': 'Dernière session : {usd}',
-  'costHud.noSession': 'Aucune session vocale active.'
+  'costHud.noSession': 'Aucune session vocale active.',
+
+  // ── components/ToolWaterfall.tsx ──────────────────────────────────────────
+  'toolWaterfall.fresh': 'frais {n}t',
+  'toolWaterfall.cache': 'cache {n}t ({pct}%)',
+  'toolWaterfall.total': '{n}t au total',
+  'toolWaterfall.noTelemetry': 'pas encore de télémétrie en direct — (re)lancez cet agent pour l’instrumenter',
+  'toolWaterfall.noToolCalls': 'Aucun appel d’outil capturé pour l’instant. Chaque outil exécuté par l’agent apparaît ici avec sa durée réelle.',
+  'toolWaterfall.ok': 'ok',
+  'toolWaterfall.failed': 'échec',
+
+  // ── components/BlockedBanner.tsx ──────────────────────────────────────────
+  'blockedBanner.needsYou': 'a besoin de vous',
+
+  // ── components/UpdatesSection.tsx ─────────────────────────────────────────
+  'updatesSection.title': 'Mises à jour',
+
+  // ── components/UpdateToast.tsx ────────────────────────────────────────────
+  'updateToast.downloadedHeadline': 'Mise à jour v{version} téléchargée',
+  'updateToast.availableHeadline': 'v{version} est disponible',
+  'updateToast.downloadedDetail': 'Redémarrez Munder Difflin quand vous voulez pour l’appliquer — rien ne redémarre tout seul.',
+  'updateToast.availableDetail': 'Cette installation ne peut pas se mettre à jour toute seule — récupérez la nouvelle version depuis la page des releases.',
+  'updateToast.later': 'plus tard',
+  'updateToast.restarting': 'redémarrage…',
+  'updateToast.restartToUpdate': 'redémarrer pour mettre à jour',
+  'updateToast.openReleases': 'ouvrir les releases',
+
+  // ── components/SidebarTabs.tsx ────────────────────────────────────────────
+  'sidebarTabs.terminal': 'terminal',
+  'sidebarTabs.git': 'git',
+  'sidebarTabs.messages': 'messages',
+  'sidebarTabs.traces': 'traces',
+
+  // ── components/RecentText.tsx ─────────────────────────────────────────────
+  'recentText.recent': 'récent',
+  'recentText.idle': 'inactif',
+  'recentText.live': 'en direct',
+
+  // ── components/TerminalView.tsx ───────────────────────────────────────────
+  'terminalView.livePipePane': 'en direct · pipe-pane',
+
+  // ── i18n/updateView.ts (UpdateBadge.tsx / UpdatesSection.tsx) ─────────────
+  'updateView.badge.ariaCheckForUpdates': 'Version {v} — vérifier les mises à jour',
+  'updateView.badge.checkingLabel': 'vérification…',
+  'updateView.badge.checkingTitle': 'Vérification des mises à jour (vous êtes en v{v})',
+  'updateView.badge.availableLabel': 'v{version} prête à installer',
+  'updateView.badge.availableTitle': 'La version {version} est disponible — cliquez pour la télécharger',
+  'updateView.badge.downloadingLabel': 'téléchargement {pct}%',
+  'updateView.badge.downloadingTitle': 'Téléchargement de la v{version}… {pct}%',
+  'updateView.badge.downloadedLabel': 'redémarrer pour passer en v{version}',
+  'updateView.badge.downloadedTitle': 'La v{version} est téléchargée et prête — cliquez pour redémarrer et l’appliquer',
+  'updateView.badge.manualLabel': 'v{version} — à récupérer manuellement',
+  'updateView.badge.manualTitleReason': 'Cette installation n’a pas pu se mettre à jour toute seule ({reason}) — cliquez pour ouvrir la page des releases',
+  'updateView.badge.manualTitle': 'Cette installation ne peut pas se mettre à jour toute seule — cliquez pour ouvrir la page des releases',
+  'updateView.badge.errorLabel': 'échec de la vérification',
+  'updateView.badge.errorTitle': '{message} — cliquez pour réessayer',
+  'updateView.badge.notAvailableTitle': 'v{v} est la dernière version — cliquez pour vérifier à nouveau',
+  'updateView.badge.idleTitle': 'v{v} — cliquez pour vérifier les mises à jour',
+  'updateView.settings.checkingHeadline': 'Vous êtes en v{v}',
+  'updateView.settings.checkingDetail': 'Vérification d’une nouvelle version…',
+  'updateView.settings.availableHeadline': 'v{version} est disponible',
+  'updateView.settings.availableDetail': 'Vous êtes en v{v}. Téléchargez-la maintenant — on vous demandera de redémarrer une fois prête.',
+  'updateView.settings.availableButton': 'Télécharger la v{version}',
+  'updateView.settings.downloadingHeadline': 'Téléchargement de la v{version}',
+  'updateView.settings.downloadingDetail': '{pct}% effectués. Vous pouvez continuer à travailler ; c’est vous qui déclenchez le redémarrage.',
+  'updateView.settings.downloadedHeadline': 'v{version} est prête à installer',
+  'updateView.settings.downloadedDetail': 'Redémarrez Munder Difflin pour terminer la mise à jour depuis la v{v}.',
+  'updateView.settings.downloadedButton': 'Redémarrer pour mettre à jour',
+  'updateView.settings.manualHeadline': 'v{version} est disponible',
+  'updateView.settings.manualDetailReason': 'Cette installation ne peut pas se mettre à jour toute seule ({reason}) — téléchargez-la depuis la page des releases.',
+  'updateView.settings.manualDetail': 'Cette installation ne peut pas se mettre à jour toute seule — téléchargez-la depuis la page des releases.',
+  'updateView.settings.manualButton': 'Ouvrir la page des releases',
+  'updateView.settings.errorHeadline': 'Échec de la vérification des mises à jour',
+  'updateView.settings.errorDetail': '{message} (vous êtes en v{v}).',
+  'updateView.settings.errorButton': 'Réessayer',
+  'updateView.settings.notAvailableHeadline': 'v{v} est la dernière version',
+  'updateView.settings.notAvailableDetail': 'Vous êtes déjà à jour — rien à installer.',
+  'updateView.settings.notAvailableButton': 'Vérifier à nouveau',
+  'updateView.settings.idleHeadline': 'Vous êtes en v{v}',
+  'updateView.settings.idleDetail': 'Les mises à jour sont vérifiées automatiquement toutes les 6 heures. Vérifiez maintenant si vous voulez en être sûr.',
+  'updateView.settings.idleButton': 'Vérifier les mises à jour'
 };

@@ -1,4 +1,5 @@
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { useT } from '@/i18n';
 import type { AccentColorName } from '@/design/tokens';
 
 export interface RecentTextProps {
@@ -13,6 +14,7 @@ export interface RecentTextProps {
  * uses while it's still composing — and disappears only when text is empty.
  */
 export function RecentText({ accent, text, seed }: RecentTextProps) {
+  const t = useT();
   const { shown, done } = useTypewriter(text, seed);
   if (!text) return null;
   return (
@@ -31,7 +33,7 @@ export function RecentText({ accent, text, seed }: RecentTextProps) {
         color: 'var(--cth-ink-700)',
         textTransform: 'uppercase'
       }}>
-        <span>recent</span>
+        <span>{t('recentText.recent', 'recent')}</span>
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
           color: done ? 'var(--cth-ink-500)' : `var(--cth-${accent})`
@@ -42,7 +44,7 @@ export function RecentText({ accent, text, seed }: RecentTextProps) {
             boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)',
             animation: done ? 'none' : 'cth-pulse 800ms steps(2, end) infinite'
           }} />
-          {done ? 'idle' : 'live'}
+          {done ? t('recentText.idle', 'idle') : t('recentText.live', 'live')}
         </span>
       </div>
       <div style={{

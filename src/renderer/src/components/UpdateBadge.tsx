@@ -13,11 +13,14 @@
  * is wiring and pixels.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { describeUpdate, reduceStatus, type UpdateStatus } from '@shared/updateState';
+import { reduceStatus, type UpdateStatus } from '@shared/updateState';
+import { describeUpdateT } from '@/i18n/updateView';
+import { useT } from '@/i18n';
 
 declare const __APP_VERSION__: string;
 
 export function UpdateBadge() {
+  const t = useT();
   const [status, setStatus] = useState<UpdateStatus | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -31,7 +34,7 @@ export function UpdateBadge() {
     return off;
   }, []);
 
-  const view = describeUpdate(status, __APP_VERSION__);
+  const view = describeUpdateT(t, status, __APP_VERSION__);
 
   const onClick = useCallback(async () => {
     if (view.action === 'none' || busy) return;
@@ -62,7 +65,7 @@ export function UpdateBadge() {
       onClick={() => { void onClick(); }}
       disabled={!interactive}
       title={view.title}
-      aria-label={view.label ? `${view.title}` : `Version ${__APP_VERSION__} — check for updates`}
+      aria-label={view.label ? `${view.title}` : t('updateView.badge.ariaCheckForUpdates', 'Version {v} — check for updates', { v: __APP_VERSION__ })}
       aria-busy={view.busy || busy}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,

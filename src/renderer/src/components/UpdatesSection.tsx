@@ -12,12 +12,15 @@
  * disagree about what is installed.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { describeUpdateSettings, reduceStatus, type UpdateStatus } from '@shared/updateState';
+import { reduceStatus, type UpdateStatus } from '@shared/updateState';
+import { describeUpdateSettingsT } from '@/i18n/updateView';
+import { useT } from '@/i18n';
 import { PixelButton } from './PixelButton';
 
 declare const __APP_VERSION__: string;
 
 export function UpdatesSection() {
+  const t = useT();
   const [status, setStatus] = useState<UpdateStatus | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -31,7 +34,7 @@ export function UpdatesSection() {
     return off;
   }, []);
 
-  const view = describeUpdateSettings(status, __APP_VERSION__);
+  const view = describeUpdateSettingsT(t, status, __APP_VERSION__);
 
   const onClick = useCallback(async () => {
     if (view.action === 'none' || busy) return;
@@ -53,7 +56,7 @@ export function UpdatesSection() {
         fontFamily: 'var(--cth-font-display)', fontSize: 8, lineHeight: '12px',
         color: 'var(--cth-ink-500)', textTransform: 'uppercase', marginBottom: 10
       }}>
-        Updates
+        {t('updatesSection.title', 'Updates')}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
