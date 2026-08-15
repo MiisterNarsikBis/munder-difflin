@@ -18,6 +18,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
+import { useT } from '@/i18n';
 
 /** Mirrors the `window.cth.onRealtimeCompletion` payload (preload). `summary` is the
  *  human-speakable line Michael relays; the rest is context for this toast. */
@@ -42,6 +43,7 @@ const AUTO_DISMISS_MS = 9000;
 const MAX_VISIBLE = 4;
 
 export function CompletionToast(): JSX.Element | null {
+  const t = useT();
   const [toasts, setToasts] = useState<ActiveToast[]>([]);
   // Stable across renders so the subscription's closures always see live timers.
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -96,9 +98,9 @@ export function CompletionToast(): JSX.Element | null {
         pointerEvents: 'none'
       }}
     >
-      {toasts.map((t) => (
+      {toasts.map((toast) => (
         <div
-          key={t.key}
+          key={toast.key}
           role="status"
           style={{
             pointerEvents: 'auto',
@@ -122,11 +124,11 @@ export function CompletionToast(): JSX.Element | null {
               textTransform: 'uppercase'
             }}
           >
-            <Icon name="bell" /> Michael · completed
+            <Icon name="bell" /> {t('completionToast.michaelCompleted', 'Michael · completed')}
             <button
               type="button"
-              onClick={() => dismiss(t.key)}
-              aria-label="Dismiss"
+              onClick={() => dismiss(toast.key)}
+              aria-label={t('completionToast.dismiss', 'Dismiss')}
               style={{
                 marginLeft: 'auto',
                 border: 'none',
@@ -150,11 +152,11 @@ export function CompletionToast(): JSX.Element | null {
               color: 'var(--cth-ink-900)'
             }}
           >
-            {t.summary}
+            {toast.summary}
           </div>
-          {t.objective && (
+          {toast.objective && (
             <div style={{ fontSize: 12, lineHeight: '17px', color: 'var(--cth-ink-700)' }}>
-              {t.objective}
+              {toast.objective}
             </div>
           )}
         </div>

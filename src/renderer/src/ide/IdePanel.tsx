@@ -6,6 +6,7 @@ import { MonacoEditor } from './MonacoEditor';
 import { MonacoDiff } from './MonacoDiff';
 import { MarkdownPreview } from '@/markdown/MarkdownPreview';
 import { HistoryPane, ComparePane } from './GitPanes';
+import { useT, t as translate } from '@/i18n';
 
 // v0.3.4 markdown preview: per-md-tab view mode, defaulted from the last choice.
 type MdView = 'code' | 'split' | 'preview';
@@ -69,6 +70,7 @@ function pickRoot(): string | null {
 }
 
 export function IdePanel() {
+  const t = useT();
   const setIdeOpen = useStore((s) => s.setIdeOpen);
   const [root] = useState<string | null>(pickRoot);
 
@@ -333,13 +335,13 @@ export function IdePanel() {
           fontFamily: 'var(--cth-font-mono)', fontSize: 13, color: 'var(--cth-ink-500)',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40vw'
         }}>
-          {root ? basename(root) : 'no workspace'}
+          {root ? basename(root) : t('idePanel.noWorkspace', 'no workspace')}
         </span>
         <button
           className="cth-titlebar-nodrag"
           onClick={() => setIdeOpen(false)}
-          title="Close IDE (Esc)"
-          aria-label="Close IDE"
+          title={t('idePanel.closeIdeEsc', 'Close IDE (Esc)')}
+          aria-label={t('idePanel.closeIde', 'Close IDE')}
           style={{
             marginLeft: 'auto',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -359,7 +361,7 @@ export function IdePanel() {
           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
           textAlign: 'center', color: 'var(--cth-ink-500)', fontFamily: 'var(--cth-font-ui)', fontSize: 16
         }}>
-          No workspace available.<br />Spawn an agent first — the IDE opens on its working directory.
+          {t('idePanel.noWorkspaceAvailable', 'No workspace available.')}<br />{t('idePanel.spawnAgentFirst', 'Spawn an agent first — the IDE opens on its working directory.')}
         </div>
       ) : (
         <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
@@ -377,8 +379,8 @@ export function IdePanel() {
             }}>
               <button
                 onClick={toggleGitRail}
-                title={gitCollapsed ? 'Expand the git panel' : 'Collapse the git panel — more room for the file tree'}
-                aria-label={gitCollapsed ? 'Expand the git panel' : 'Collapse the git panel'}
+                title={gitCollapsed ? t('idePanel.expandGitPanel', 'Expand the git panel') : t('idePanel.collapseGitPanel', 'Collapse the git panel — more room for the file tree')}
+                aria-label={gitCollapsed ? t('idePanel.expandGitPanel', 'Expand the git panel') : t('idePanel.collapseGitPanelShort', 'Collapse the git panel')}
                 aria-expanded={!gitCollapsed}
                 style={{
                   ...iconBtn,
@@ -401,11 +403,11 @@ export function IdePanel() {
                     background: railTab === k && !gitCollapsed ? 'var(--cth-sky-light)' : 'transparent',
                     boxShadow: railTab === k && !gitCollapsed ? 'inset 0 0 0 1px var(--cth-ink-300)' : 'none'
                   }}
-                >{k}</button>
+                >{t(`idePanel.railTab.${k}`, k)}</button>
               ))}
               <span style={{ flex: 1 }} />
               {railTab === 'changes' && !gitCollapsed && (
-                <button onClick={() => refreshStatus()} title="Refresh" style={iconBtn}>
+                <button onClick={() => refreshStatus()} title={t('idePanel.refresh', 'Refresh')} style={iconBtn}>
                   <Icon name="web" />
                 </button>
               )}
@@ -419,10 +421,10 @@ export function IdePanel() {
                   off the bottom with no way to reach the end. */}
               <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
                 {isRepo === false && (
-                  <div style={{ padding: '6px 12px', fontSize: 12, color: 'var(--cth-ink-500)' }}>not a git repo</div>
+                  <div style={{ padding: '6px 12px', fontSize: 12, color: 'var(--cth-ink-500)' }}>{t('idePanel.notAGitRepo', 'not a git repo')}</div>
                 )}
                 {isRepo && changedFiles.length === 0 && (
-                  <div style={{ padding: '6px 12px', fontSize: 12, color: 'var(--cth-ink-500)' }}>working tree clean</div>
+                  <div style={{ padding: '6px 12px', fontSize: 12, color: 'var(--cth-ink-500)' }}>{t('idePanel.workingTreeClean', 'working tree clean')}</div>
                 )}
                 {changedFiles.map((f) => {
                   const active = activeKey === tabKey('diff', f.path);
@@ -459,7 +461,7 @@ export function IdePanel() {
             )}
             {/* FILES */}
             <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', borderTop: '1px solid var(--cth-ink-300)' }}>
-              <SectionHeader title="files" />
+              <SectionHeader title={t('idePanel.files', 'files')} />
               <div style={{ flex: 1, minHeight: 0 }}>
                 <FileTree root={root} activeRel={activeEditRel} onOpenFile={openEdit} onCopyPath={copyAbs} />
               </div>
@@ -499,14 +501,14 @@ export function IdePanel() {
                         fontFamily: 'var(--cth-font-display)', fontSize: 7, padding: '1px 3px',
                         background: t.mode === 'revdiff' ? 'var(--cth-lilac-light)' : 'var(--cth-sky-light)',
                         color: 'var(--cth-ink-900)'
-                      }}>{t.mode === 'revdiff' ? (t.revLabel ?? 'REV') : 'DIFF'}</span>
+                      }}>{t.mode === 'revdiff' ? (t.revLabel ?? translate('idePanel.rev', 'REV')) : translate('idePanel.diff', 'DIFF')}</span>
                     )}
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {basename(t.rel)}{dirty ? ' •' : ''}
                     </span>
                     <button
                       onClick={(e) => { e.stopPropagation(); closeTab(t.key); }}
-                      title="Close tab"
+                      title={translate('idePanel.closeTab', 'Close tab')}
                       style={{ ...iconBtn, width: 16, height: 16 }}
                     >
                       <Icon name="x" />
@@ -527,16 +529,16 @@ export function IdePanel() {
                   <div style={{
                     fontFamily: 'var(--cth-font-display)', fontSize: 8, textTransform: 'uppercase',
                     letterSpacing: 1, color: 'var(--cth-ink-700)'
-                  }}>nothing open</div>
+                  }}>{t('idePanel.nothingOpen', 'nothing open')}</div>
                   <div style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 13 }}>
-                    Pick a file from the tree to edit, or a changed file to diff.
+                    {t('idePanel.pickFileHint', 'Pick a file from the tree to edit, or a changed file to diff.')}
                   </div>
                 </div>
               )}
 
               {activeTab?.mode === 'edit' && (() => {
                 const buf = editBuffers[activeTab.rel];
-                if (!buf || buf.status === 'loading') return <Centered>loading…</Centered>;
+                if (!buf || buf.status === 'loading') return <Centered>{t('idePanel.loadingEllipsis', 'loading…')}</Centered>;
                 if (buf.status === 'error') return <Centered tone="error">{buf.error}</Centered>;
                 const md = isMarkdown(activeTab.rel);
                 const view: MdView = md ? (mdViews[activeTab.rel] ?? defaultMdView()) : 'code';
@@ -581,9 +583,9 @@ export function IdePanel() {
 
               {activeTab?.mode === 'revdiff' && (() => {
                 const d = diffData[activeTab.key];
-                if (!d || d.status === 'loading') return <Centered>loading diff…</Centered>;
+                if (!d || d.status === 'loading') return <Centered>{t('idePanel.loadingDiff', 'loading diff…')}</Centered>;
                 if (d.status === 'error') return <Centered tone="error">{d.error}</Centered>;
-                if (d.status === 'binary') return <Centered>binary file — no text diff</Centered>;
+                if (d.status === 'binary') return <Centered>{t('idePanel.binaryNoTextDiff', 'binary file — no text diff')}</Centered>;
                 return (
                   <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <div style={{
@@ -608,9 +610,9 @@ export function IdePanel() {
 
               {activeTab?.mode === 'diff' && (() => {
                 const d = diffData[activeTab.rel];
-                if (!d || d.status === 'loading') return <Centered>loading diff…</Centered>;
+                if (!d || d.status === 'loading') return <Centered>{t('idePanel.loadingDiff', 'loading diff…')}</Centered>;
                 if (d.status === 'error') return <Centered tone="error">{d.error}</Centered>;
-                if (d.status === 'binary') return <Centered>binary file — no text diff</Centered>;
+                if (d.status === 'binary') return <Centered>{t('idePanel.binaryNoTextDiff', 'binary file — no text diff')}</Centered>;
                 return (
                   <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <div style={{
@@ -620,12 +622,12 @@ export function IdePanel() {
                     }}>
                       <span style={{ color: 'var(--cth-ink-500)' }}>HEAD</span>
                       <Icon name="arrow-right" />
-                      <span>working tree</span>
+                      <span>{t('idePanel.workingTree', 'working tree')}</span>
                       <span style={{
                         flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         fontFamily: 'var(--cth-font-mono)', textAlign: 'right'
                       }} title={activeTab.rel}>{activeTab.rel}</span>
-                      <button onClick={() => ensureDiff(activeTab.rel, true)} title="Refresh diff" style={iconBtn}>
+                      <button onClick={() => ensureDiff(activeTab.rel, true)} title={t('idePanel.refreshDiff', 'Refresh diff')} style={iconBtn}>
                         <Icon name="web" />
                       </button>
                     </div>
@@ -661,6 +663,17 @@ function EditorBar({ rel, dirty, saveState, onSave, onCopy, mdView, onMdView }: 
   /** Set only for markdown files — renders the code|split|preview switch. */
   mdView?: MdView; onMdView?: (v: MdView) => void;
 }) {
+  const t = useT();
+  const mdViewTitle: Record<MdView, string> = {
+    code: t('idePanel.mdView.sourceOnly', 'Source only'),
+    split: t('idePanel.mdView.sourceAndPreview', 'Source + preview'),
+    preview: t('idePanel.mdView.renderedPreview', 'Rendered preview')
+  };
+  const mdViewLabel: Record<MdView, string> = {
+    code: t('idePanel.mdView.code', 'code'),
+    split: t('idePanel.mdView.split', 'split'),
+    preview: t('idePanel.mdView.preview', 'preview')
+  };
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px',
@@ -677,20 +690,20 @@ function EditorBar({ rel, dirty, saveState, onSave, onCopy, mdView, onMdView }: 
             <button
               key={v}
               onClick={() => onMdView(v)}
-              title={v === 'code' ? 'Source only' : v === 'split' ? 'Source + preview' : 'Rendered preview'}
+              title={mdViewTitle[v]}
               style={{
                 ...textBtn,
                 background: mdView === v ? 'var(--cth-sky-light)' : 'var(--cth-cream-100)',
                 boxShadow: mdView === v ? 'inset 0 0 0 1px var(--cth-ink-500)' : 'inset 0 0 0 1px var(--cth-ink-100)'
               }}
-            >{v}</button>
+            >{mdViewLabel[v]}</button>
           ))}
         </span>
       )}
-      <button onClick={onCopy} title="Copy absolute path" style={textBtn}>copy path</button>
-      <button onClick={onSave} disabled={!dirty || saveState === 'saving'} title="Save (Cmd/Ctrl+S)"
+      <button onClick={onCopy} title={t('idePanel.copyAbsolutePath', 'Copy absolute path')} style={textBtn}>{t('idePanel.copyPath', 'copy path')}</button>
+      <button onClick={onSave} disabled={!dirty || saveState === 'saving'} title={t('idePanel.saveCmdCtrlS', 'Save (Cmd/Ctrl+S)')}
         style={{ ...textBtn, opacity: dirty ? 1 : 0.5 }}>
-        {saveState === 'saving' ? '...' : saveState === 'saved' ? 'saved' : saveState === 'error' ? 'err' : 'save'}
+        {saveState === 'saving' ? '...' : saveState === 'saved' ? t('idePanel.saved', 'saved') : saveState === 'error' ? t('idePanel.err', 'err') : t('idePanel.save', 'save')}
       </button>
     </div>
   );

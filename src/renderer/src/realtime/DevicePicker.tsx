@@ -18,6 +18,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useRealtimeMichael } from './session';
+import { useT } from '@/i18n';
 
 interface AudioDevice {
   deviceId: string;
@@ -58,6 +59,7 @@ const selectStyle: React.CSSProperties = {
 };
 
 export function RealtimeDevicePicker(): React.ReactElement {
+  const t = useT();
   const { deviceId, setDeviceId, outputDeviceId, setOutputDeviceId } = useRealtimeMichael();
   const [mics, setMics] = useState<AudioDevice[]>([]);
   const [speakers, setSpeakers] = useState<AudioDevice[]>([]);
@@ -87,13 +89,13 @@ export function RealtimeDevicePicker(): React.ReactElement {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 280 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <span style={labelStyle}>Microphone</span>
+        <span style={labelStyle}>{t('devicePicker.microphone', 'Microphone')}</span>
         <select
           value={deviceId ?? ''}
           onChange={(e) => setDeviceId(e.target.value || null)}
           style={selectStyle}
         >
-          <option value="">System default</option>
+          <option value="">{t('devicePicker.systemDefault', 'System default')}</option>
           {mics.map((m) => (
             <option key={m.deviceId} value={m.deviceId}>
               {m.label}
@@ -104,13 +106,13 @@ export function RealtimeDevicePicker(): React.ReactElement {
 
       {CAN_PICK_SPEAKER && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={labelStyle}>Speaker</span>
+          <span style={labelStyle}>{t('devicePicker.speaker', 'Speaker')}</span>
           <select
             value={outputDeviceId ?? ''}
             onChange={(e) => setOutputDeviceId(e.target.value || null)}
             style={selectStyle}
           >
-            <option value="">System default</option>
+            <option value="">{t('devicePicker.systemDefault', 'System default')}</option>
             {speakers.map((s) => (
               <option key={s.deviceId} value={s.deviceId}>
                 {s.label}
@@ -122,8 +124,7 @@ export function RealtimeDevicePicker(): React.ReactElement {
 
       {!labelled && (
         <span style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-500)' }}>
-          Device names appear after you first start a voice session and grant mic access.
-          The microphone choice applies the next time Michael connects; the speaker switches live.
+          {t('devicePicker.hint', 'Device names appear after you first start a voice session and grant mic access. The microphone choice applies the next time Michael connects; the speaker switches live.')}
         </span>
       )}
     </div>
