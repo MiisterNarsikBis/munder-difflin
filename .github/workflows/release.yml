@@ -16,6 +16,11 @@ jobs:
   build:
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # `secrets` isn't a recognized named-value inside a step's `if:` (only in
+    # `env:`/`with:` mappings) — compute it here once so the signing step below
+    # can gate on `env.HAS_APPLE_CERT` instead.
+    env:
+      HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_P12 != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -64,7 +69,7 @@ jobs:
       # which never set these at all). So these only get exported to $GITHUB_ENV —
       # leaving them truly unset otherwise — when there's a real cert to sign with.
       - name: Configure macOS signing env
-        if: matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_P12 != ''
+        if: matrix.os == 'macos-latest' && env.HAS_APPLE_CERT == 'true'
         run: |
           echo "CSC_LINK=${{ secrets.APPLE_CERTIFICATE_P12 }}" >> "$GITHUB_ENV"
           echo "CSC_KEY_PASSWORD=${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" >> "$GITHUB_ENV"
