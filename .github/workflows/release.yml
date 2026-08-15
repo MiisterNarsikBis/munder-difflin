@@ -56,33 +56,28 @@ jobs:
           POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
           POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
 
+      # macOS code signing + notarization creds. electron-builder treats a DEFINED
+      # env var differently from an ABSENT one — CSC_LINK='' (empty but present) is
+      # still read as "the user gave us a cert", resolves '' as a relative path (the
+      # repo checkout dir) and fails with "<repo> not a file" instead of skipping
+      # signing, unlike an unset CSC_LINK which skips cleanly (see Windows/Linux,
+      # which never set these at all). So these only get exported to $GITHUB_ENV —
+      # leaving them truly unset otherwise — when there's a real cert to sign with.
+      - name: Configure macOS signing env
+        if: matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_P12 != ''
+        run: |
+          echo "CSC_LINK=${{ secrets.APPLE_CERTIFICATE_P12 }}" >> "$GITHUB_ENV"
+          echo "CSC_KEY_PASSWORD=${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> "$GITHUB_ENV"
+          echo "APPLE_APP_SPECIFIC_PASSWORD=${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> "$GITHUB_ENV"
+
       - name: Package installers
         # GH_TOKEN lets electron-builder skip its own publish; we upload via the
         # release step below for full control over the asset set.
         run: npx electron-builder ${{ matrix.args }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS code signing + notarization — MUST be macOS-only. CSC_LINK is the
-          # Apple Developer ID .p12; if it leaks into the Windows/Linux runners,
-          # electron-builder tries to sign those targets with the mac cert and the
-          # build hard-fails ("cannot extract publisher name"). So gate on the OS.
-          #   APPLE_CERTIFICATE_P12       = base64 of the "Developer ID Application" .p12
-          #   APPLE_CERTIFICATE_PASSWORD  = that .p12's export password (REQUIRED if P12 set,
-          #                                 else electron-builder imports with an empty
-          #                                 password and fails "MAC verification failed")
-          # All optional: with the secrets unset every runner builds unsigned and stays green.
-          CSC_LINK: ${{ matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_P12 || '' }}
-          CSC_KEY_PASSWORD: ${{ matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_ID: ${{ matrix.os == 'macos-latest' && secrets.APPLE_ID || '' }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ matrix.os == 'macos-latest' && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
-          APPLE_TEAM_ID: ${{ matrix.os == 'macos-latest' && secrets.APPLE_TEAM_ID || '' }}
-          # macOS-only quirk: electron-builder's CSC_IDENTITY_AUTO_DISCOVERY (default
-          # true) still probes the runner's default keychain and mishandles an empty
-          # (but DEFINED) CSC_LINK — it resolves '' as a relative path, which is the repo
-          # checkout dir, and fails with "<repo> not a file" instead of skipping signing
-          # like Windows does. Force auto-discovery off when there's no real cert secret;
-          # leave it at its default (on) when APPLE_CERTIFICATE_P12 is actually set.
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_P12 == '' && 'false' || '' }}
 
       - name: Generate checksums
         shell: bash
