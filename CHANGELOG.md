@@ -4,6 +4,32 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.4] — 2026-08-15
+
+**The app speaks French.** Munder Difflin's UI — every screen, dialog, tooltip and status
+label across onboarding, the Command Center, Settings, the IDE, the Triggers hub and the
+office floor itself — now has a complete French translation, toggleable from Settings without
+a restart.
+
+### Added
+- **Full French UI.** `src/renderer/src/i18n/` centralizes every French string in one
+  dictionary (`fr.ts`, ~1000 keys); components call `useT()` / `t()` with an English fallback,
+  so a missing key never breaks the app, it just falls back to English for that one string.
+- **Language toggle in Settings**, applied live — no restart required.
+- **French README** (`README.fr.md`), linked from the top of the English one.
+- Two shared, main-process-safe modules (`shared/updateState.ts`, `shared/triggers.ts`) that
+  can't call the renderer's `t()` got renderer-side translation wrappers
+  (`i18n/updateView.ts`, `triggers/ui.tsx`'s `modeLabel()`) so their wording stays in one
+  place while the language lives in `fr.ts`.
+- The office floor's break-room banter (short in-character one-liners shown as thought
+  bubbles) got a French-adapted set of lines — not literal translations, French-native jokes
+  kept to the same short length so they still fit the speech bubble.
+
+### Unchanged
+- Agent prompts, hive messages between agents, and CLI/tool output are untouched — only the
+  app's own UI chrome is translated. Product/brand names, CLI provider names (Claude Code,
+  Codex, Grok, …), and the office cast's character names are never translated.
+
 ## [0.4.3] — 2026-08-13
 
 **A new brand mark: Michael's portrait replaces the "MD" tile.**
