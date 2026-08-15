@@ -1052,5 +1052,39 @@ export const FR: Record<string, string> = {
   'codeEditor.exitFullscreen': 'Quitter le plein écran (Échap)',
   'codeEditor.fullscreen': 'Plein écran',
   'codeEditor.loadingEllipsis': 'chargement…',
-  'codeEditor.exitFullscreenLabel': 'quitter le plein écran'
+  'codeEditor.exitFullscreenLabel': 'quitter le plein écran',
+
+  // ── components/FullscreenFileEditor.tsx ───────────────────────────────────
+  'fullscreenFileEditor.loadingEllipsis': 'chargement…',
+  'fullscreenFileEditor.file': 'FICHIER',
+  'fullscreenFileEditor.editSource': 'Modifier la source',
+  'fullscreenFileEditor.renderedPreview': 'Aperçu rendu (du fichier enregistré)',
+  'fullscreenFileEditor.edit': 'modifier',
+  'fullscreenFileEditor.preview': 'aperçu',
+  'fullscreenFileEditor.openInIdeTitle': 'Ouvrir ce fichier dans l’IDE complet',
+  'fullscreenFileEditor.openInIde': 'ouvrir dans l’IDE',
+  'fullscreenFileEditor.closeEsc': 'Fermer (Échap)',
+
+  // ── components/MemoryGraphPanel.tsx ───────────────────────────────────────
+  'memoryGraphPanel.noMemoryRecorded': 'Aucune mémoire enregistrée pour l’instant.',
+  'memoryGraphPanel.topics': 'sujets',
+  'memoryGraphPanel.refresh': 'Actualiser',
+  'memoryGraphPanel.readingMemory': 'lecture de la mémoire…',
+  'memoryGraphPanel.showingTopics': '{shown} sujet(s) affiché(s) sur {total}',
+  'memoryGraphPanel.noMessagesYet': 'Aucun message enregistré pour l’instant — la ruche est calme. Agents affichés comme effectif.',
+  'memoryGraphPanel.loadingMemory': 'chargement de la mémoire…',
+  'memoryGraphPanel.messageLinkOne': '1 lien de message',
+  'memoryGraphPanel.messageLinkMany': '{n} liens de messages',
+  'memoryGraphPanel.sharedByAgents': 'partagé par {n} agents',
+  'memoryGraphPanel.escalationsToHuman': 'escalades vers l’humain',
+  'memoryGraphPanel.broadcastToEveryone': 'diffusé à tout le monde',
+  'memoryGraphPanel.knowsAbout': '{a} connaît « {b} »',
+  'memoryGraphPanel.messageLastOne': '1 message · dernier : {act}',
+  'memoryGraphPanel.messageLastMany': '{n} messages · dernier : {act}',
+  'memoryGraphPanel.legend.request': 'demande',
+  'memoryGraphPanel.legend.query': 'question',
+  'memoryGraphPanel.legend.propose': 'proposition',
+  'memoryGraphPanel.legend.agreeDone': 'accord/terminé',
+  'memoryGraphPanel.legend.refuse': 'refus',
+  'memoryGraphPanel.legend.informTopic': 'info/sujet'
 };

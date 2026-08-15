@@ -11,6 +11,7 @@ import {
   type MessageLogEntry
 } from './memoryGraph/buildGraph';
 import { forceLayout, type Positions } from './memoryGraph/forceLayout';
+import { useT, t as translate } from '@/i18n';
 
 /** The memory-graph tab: hive agents as nodes, messages as edges, an optional
  *  topic layer from each agent's memory file. SVG-rendered (DESIGN.md neo-pixel:
@@ -25,6 +26,7 @@ export function MemoryGraphPanel({
   godId: string;
   onJumpToMemory: (agentId: string) => void;
 }) {
+  const t = useT();
   const agents = useStore((s) => s.agents);
 
   const [log, setLog] = useState<MessageLogEntry[]>([]);
@@ -186,14 +188,14 @@ export function MemoryGraphPanel({
         display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', flexShrink: 0,
         borderBottom: '1px solid var(--cth-ink-300)', background: 'var(--cth-cream-100)', flexWrap: 'wrap'
       }}>
-        <Toggle on={showTopics} onClick={() => setShowTopics((v) => !v)} label="topics" />
-        <button onClick={refresh} title="Refresh" style={iconBtn}>
-          <Icon name="gear" /> refresh
+        <Toggle on={showTopics} onClick={() => setShowTopics((v) => !v)} label={t('memoryGraphPanel.topics', 'topics')} />
+        <button onClick={refresh} title={t('memoryGraphPanel.refresh', 'Refresh')} style={iconBtn}>
+          <Icon name="gear" /> {t('memoryGraphPanel.refresh', 'Refresh').toLowerCase()}
         </button>
         <div style={{ flex: 1 }} />
         {showTopics && (
           <span style={{ fontSize: 11, color: 'var(--cth-ink-500)' }}>
-            {loadingTopics ? 'reading memory…' : `showing ${graph.topicShown} of ${graph.topicTotal} topics`}
+            {loadingTopics ? t('memoryGraphPanel.readingMemory', 'reading memory…') : t('memoryGraphPanel.showingTopics', 'showing {shown} of {total} topics', { shown: graph.topicShown, total: graph.topicTotal })}
           </span>
         )}
       </div>
@@ -344,7 +346,7 @@ export function MemoryGraphPanel({
           <div style={{
             position: 'absolute', top: 10, left: 0, right: 0, textAlign: 'center',
             fontSize: 12, color: 'var(--cth-ink-500)', pointerEvents: 'none'
-          }}>No messages logged yet — the hive is quiet. Agents shown as roster.</div>
+          }}>{t('memoryGraphPanel.noMessagesYet', 'No messages logged yet — the hive is quiet. Agents shown as roster.')}</div>
         )}
 
         {/* tooltip */}
@@ -366,15 +368,20 @@ export function MemoryGraphPanel({
 // ─── tooltip bodies ──────────────────────────────────────────────────────────
 
 function NodeTip({ node, memories }: { node: GraphNode; memories: Record<string, string> }) {
+  const t = useT();
   if (node.kind === 'agent') {
     const mem = memories[node.id];
-    const snippet = mem === undefined ? 'loading memory…' : memorySnippet(mem);
+    const snippet = mem === undefined ? t('memoryGraphPanel.loadingMemory', 'loading memory…') : memorySnippet(mem);
     return (
       <>
         <div style={tipTitle}>{node.label}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '2px 0 4px' }}>
           <PixelBadge status={node.status} />
-          <span style={{ fontSize: 11, color: 'var(--cth-ink-500)' }}>{node.degree} message link{node.degree === 1 ? '' : 's'}</span>
+          <span style={{ fontSize: 11, color: 'var(--cth-ink-500)' }}>
+            {node.degree === 1
+              ? t('memoryGraphPanel.messageLinkOne', '1 message link')
+              : t('memoryGraphPanel.messageLinkMany', '{n} message links', { n: node.degree })}
+          </span>
         </div>
         <div style={tipBody}>{snippet}</div>
       </>
@@ -384,30 +391,33 @@ function NodeTip({ node, memories }: { node: GraphNode; memories: Record<string,
     return (
       <>
         <div style={tipTitle}>{node.label}</div>
-        <div style={tipBody}>shared by {node.weight} agents</div>
+        <div style={tipBody}>{t('memoryGraphPanel.sharedByAgents', 'shared by {n} agents', { n: node.weight })}</div>
       </>
     );
   }
   return (
     <>
       <div style={tipTitle}>{node.label}</div>
-      <div style={tipBody}>{node.id === 'human' ? 'escalations to the human' : 'broadcast to everyone'}</div>
+      <div style={tipBody}>{node.id === 'human' ? t('memoryGraphPanel.escalationsToHuman', 'escalations to the human') : t('memoryGraphPanel.broadcastToEveryone', 'broadcast to everyone')}</div>
     </>
   );
 }
 
 function EdgeTip({ edge, nodeById }: { edge: GraphEdge; nodeById: Map<string, GraphNode> }) {
+  const t = useT();
   const a = nodeById.get(edge.source)?.label ?? edge.source;
   const b = nodeById.get(edge.target)?.label ?? edge.target;
   if (edge.kind === 'topic') {
-    return <div style={tipBody}>{a} knows about “{b}”</div>;
+    return <div style={tipBody}>{t('memoryGraphPanel.knowsAbout', '{a} knows about “{b}”', { a, b })}</div>;
   }
   const arrow = edge.dir === 'both' ? '↔' : edge.dir === 'bwd' ? '←' : '→';
   return (
     <>
       <div style={tipTitle}>{a} {arrow} {b}</div>
       <div style={{ fontSize: 11, color: 'var(--cth-ink-500)', margin: '2px 0' }}>
-        {edge.weight} message{edge.weight === 1 ? '' : 's'} · last: {edge.lastAct ?? '—'}
+        {edge.weight === 1
+          ? t('memoryGraphPanel.messageLastOne', '1 message · last: {act}', { act: edge.lastAct ?? '—' })
+          : t('memoryGraphPanel.messageLastMany', '{n} messages · last: {act}', { n: edge.weight, act: edge.lastAct ?? '—' })}
       </div>
       {edge.lastSubject && <div style={tipBody}>{truncate(edge.lastSubject, 80)}</div>}
     </>
@@ -415,13 +425,14 @@ function EdgeTip({ edge, nodeById }: { edge: GraphEdge; nodeById: Map<string, Gr
 }
 
 function Legend() {
+  const t = useT();
   const items: { c: string; label: string }[] = [
-    { c: actColor('request'), label: 'request' },
-    { c: actColor('query'), label: 'query' },
-    { c: actColor('propose'), label: 'propose' },
-    { c: actColor('agree'), label: 'agree/done' },
-    { c: actColor('refuse'), label: 'refuse' },
-    { c: 'var(--cth-ink-300)', label: 'inform/topic' }
+    { c: actColor('request'), label: t('memoryGraphPanel.legend.request', 'request') },
+    { c: actColor('query'), label: t('memoryGraphPanel.legend.query', 'query') },
+    { c: actColor('propose'), label: t('memoryGraphPanel.legend.propose', 'propose') },
+    { c: actColor('agree'), label: t('memoryGraphPanel.legend.agreeDone', 'agree/done') },
+    { c: actColor('refuse'), label: t('memoryGraphPanel.legend.refuse', 'refuse') },
+    { c: 'var(--cth-ink-300)', label: t('memoryGraphPanel.legend.informTopic', 'inform/topic') }
   ];
   return (
     <div style={{
@@ -513,12 +524,13 @@ function truncate(s: string, n: number): string {
 
 /** First meaningful line(s) of a memory file, for the hover preview. */
 function memorySnippet(text: string): string {
-  if (!text.trim()) return 'No memory recorded yet.';
+  const none = translate('memoryGraphPanel.noMemoryRecorded', 'No memory recorded yet.');
+  if (!text.trim()) return none;
   const lines = text
     .split('\n')
     .map((l) => l.replace(/^[#>\-*\s]+/, '').trim())
     .filter((l) => l && !/^_.*_$/.test(l) && !/^memory —/i.test(l));
-  return truncate(lines.slice(0, 3).join(' '), 200) || 'No memory recorded yet.';
+  return truncate(lines.slice(0, 3).join(' '), 200) || none;
 }
 
 const iconBtn: React.CSSProperties = {
