@@ -1272,5 +1272,16 @@ export const FR: Record<string, string> = {
   'triggerHistoryTab.section.webhooksLabel': 'Webhooks',
   'triggerHistoryTab.section.webhooksBlurb': "Tout ce qui est déposé sur vos points d'accès webhook, à côté de ce que Michael a renvoyé.",
   'triggerHistoryTab.section.organizationLabel': 'Organisation',
-  'triggerHistoryTab.section.organizationBlurb': 'Messages des nœuds clones de vos coéquipiers, à côté de ce que Michael a renvoyé.'
+  'triggerHistoryTab.section.organizationBlurb': 'Messages des nœuds clones de vos coéquipiers, à côté de ce que Michael a renvoyé.',
+
+  // ── components/PixelBadge.tsx ──────────────────────────────────────────────
+  'pixelBadge.idle': 'inactif',
+  'pixelBadge.working': 'au travail',
+  'pixelBadge.waiting': 'en attente',
+  'pixelBadge.needsYou': 'a besoin de vous',
+  'pixelBadge.done': 'terminé',
+  'pixelBadge.gone': 'parti',
+  'pixelBadge.compacting': 'compactage',
+  'pixelBadge.looping': 'en boucle',
+  'pixelBadge.yourDraft': 'votre brouillon'
 };
