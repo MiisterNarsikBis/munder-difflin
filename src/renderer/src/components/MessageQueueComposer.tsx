@@ -6,6 +6,7 @@ import { clearTerminalDraft, dismissTerminalPicker, terminalAutomationBlockFor }
 import type { TerminalAutomationBlock } from './terminalAutomation';
 import { freeflowRecorder, useFreeflow } from '@/freeflow/recorder';
 import { useTerminalFontSize } from './terminalFontSize';
+import { useT } from '@/i18n';
 
 const EMPTY_QUEUE: QueuedMessage[] = [];
 
@@ -27,6 +28,7 @@ export interface MessageQueueComposerProps {
  * TUI one-by-one as soon as it goes idle (see useHive's flush loop).
  */
 export function MessageQueueComposer({ agent }: MessageQueueComposerProps) {
+  const t = useT();
   const queue = useStore((s) => s.messageQueues[agent.id]) ?? EMPTY_QUEUE;
   const enqueueMessage = useStore((s) => s.enqueueMessage);
   const removeQueuedMessage = useStore((s) => s.removeQueuedMessage);
@@ -51,11 +53,11 @@ export function MessageQueueComposer({ agent }: MessageQueueComposerProps) {
   const ffHint = !freeflowEnabled
     ? null
     : ffMine && ff.status === 'recording'
-    ? '● recording — click stop to transcribe'
+    ? t('messageQueueComposer.recordingHint', '● recording — click stop to transcribe')
     : ffMine && ff.status === 'transcribing'
-    ? 'transcribing…'
+    ? t('messageQueueComposer.transcribingHint', 'transcribing…')
     : ff.error && (ffMine || ff.targetAgentId === null)
-    ? `voice: ${ff.error}`
+    ? t('messageQueueComposer.voiceError', 'voice: {error}', { error: ff.error })
     : null;
 
   // The draft box is the terminal's twin — it should read at the same size the
@@ -160,16 +162,16 @@ export function MessageQueueComposer({ agent }: MessageQueueComposerProps) {
   const statusHint = queue.length === 0
     ? null
     : !idle
-    ? `${agent.name} is busy — ${queue.length} queued`
+    ? t('messageQueueComposer.busyQueued', '{name} is busy — {n} queued', { name: agent.name, n: queue.length })
     : deliveryPaused && !queue[0]?.manual
-    ? 'held — delivery paused floor-wide'
+    ? t('messageQueueComposer.heldPausedFloorWide', 'held — delivery paused floor-wide')
     : block === 'draft'
-    ? `held — ${agent.name}'s terminal has unsent text on its prompt`
+    ? t('messageQueueComposer.heldUnsentText', "held — {name}'s terminal has unsent text on its prompt", { name: agent.name })
     : block === 'picker'
-    ? `held — a slash-command picker is open in ${agent.name}'s terminal`
+    ? t('messageQueueComposer.heldPickerOpen', "held — a slash-command picker is open in {name}'s terminal", { name: agent.name })
     : block === 'exited'
-    ? `held — ${agent.name}'s terminal has exited`
-    : `sending to ${agent.name} one-by-one…`;
+    ? t('messageQueueComposer.heldExited', "held — {name}'s terminal has exited", { name: agent.name })
+    : t('messageQueueComposer.sendingOneByOne', 'sending to {name} one-by-one…', { name: agent.name });
 
   return (
     <div
@@ -194,7 +196,7 @@ export function MessageQueueComposer({ agent }: MessageQueueComposerProps) {
         <span style={{
           fontFamily: 'var(--cth-font-display)', fontSize: 9, lineHeight: '12px',
           color: 'var(--cth-ink-700)', textAlign: 'center'
-        }}>DROP TO ATTACH</span>
+        }}>{t('messageQueueComposer.dropToAttach', 'DROP TO ATTACH')}</span>
       )}
       {/* Header: label, count, status, clear-all */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -202,7 +204,7 @@ export function MessageQueueComposer({ agent }: MessageQueueComposerProps) {
           fontFamily: 'var(--cth-font-display)',
           fontSize: 9, lineHeight: '12px',
           color: 'var(--cth-ink-700)'
-        }}>QUEUE</span>
+        }}>{t('messageQueueComposer.queue', 'QUEUE')}</span>
         {queue.length > 0 && (
           <span style={{
             fontSize: 11, padding: '1px 6px 0',

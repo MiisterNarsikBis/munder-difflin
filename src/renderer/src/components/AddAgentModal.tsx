@@ -27,6 +27,7 @@ import {
   providerPreset,
   isClaudeProvider
 } from '@/store/config';
+import { useT } from '@/i18n';
 
 const ACCENTS: AccentColorName[] = ['coral', 'mint', 'sky', 'lemon', 'lilac', 'peach'];
 
@@ -138,6 +139,7 @@ export interface AddAgentModalProps {
 }
 
 export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModalProps) {
+  const t = useT();
   const addAgent = useStore(s => s.addAgent);
   // A validated hire manifest (deep link / file import) seeds the form. Manifests
   // NEVER auto-spawn — the human reviews every field (esp. the command) first.
@@ -251,7 +253,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
     const sid = resumeSessionId.trim();
     if (!sid) { setFolderNote(undefined); return; }
     const resolved = await window.cth.resolveSessionCwd(sid);
-    if (resolved) { setCwd(resolved); setFolderNote(`folder set from session: ${resolved}`); }
+    if (resolved) { setCwd(resolved); setFolderNote(t('addAgentModal.folderSetFromSession', 'folder set from session: {path}', { path: resolved })); }
     else setFolderNote(undefined);
   };
 
@@ -317,9 +319,9 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
     setError(undefined);
     // A required field can live in a section the user hasn't opened, so jump to
     // the offending section as we surface the error — the field is never hidden.
-    if (!name.trim()) { setError('Name is required'); setSection('identity'); return; }
-    if (!cwd) { setError('Pick a folder first'); setSection('workspace'); return; }
-    if (!command.trim()) { setError('Command is required'); setSection('engine'); return; }
+    if (!name.trim()) { setError(t('addAgentModal.error.nameRequired', 'Name is required')); setSection('identity'); return; }
+    if (!cwd) { setError(t('addAgentModal.error.folderRequired', 'Pick a folder first')); setSection('workspace'); return; }
+    if (!command.trim()) { setError(t('addAgentModal.error.commandRequired', 'Command is required')); setSection('engine'); return; }
 
     setBusy(true);
     const id = uniqueId(name);
@@ -355,7 +357,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
     });
     if (!spawnRes.ok) {
       setBusy(false);
-      setError(spawnRes.error ?? 'spawn failed');
+      setError(spawnRes.error ?? t('addAgentModal.error.spawnFailed', 'spawn failed'));
       return;
     }
     // #2 — the requested resume session id wasn't found anywhere; main fell back
@@ -451,13 +453,13 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                 display: 'flex', flexDirection: 'column', gap: 2
               }}>
                 <span>
-                  📋 hire imported: <strong>{hireMeta.name}</strong>
-                  {hireMeta.author ? <> · by {hireMeta.author}</> : null}
+                  {t('addAgentModal.hire.imported', '📋 hire imported:')} <strong>{hireMeta.name}</strong>
+                  {hireMeta.author ? <> · {t('addAgentModal.hire.by', 'by {author}', { author: hireMeta.author })}</> : null}
                 </span>
-                <span>review every field — especially the command — before spawning.</span>
+                <span>{t('addAgentModal.hire.reviewFields', 'review every field — especially the command — before spawning.')}</span>
                 {hireMeta.commandFlags && hireMeta.commandFlags.length > 0 && (
                   <span style={{ display: 'flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap', marginTop: 2 }}>
-                    <span style={{ fontSize: 12 }}>⚠️ flags this hire appends to the command:</span>
+                    <span style={{ fontSize: 12 }}>{t('addAgentModal.hire.flags', '⚠️ flags this hire appends to the command:')}</span>
                     {hireMeta.commandFlags.map((f, i) => (
                       <code
                         key={`${f}-${i}`}
@@ -477,7 +479,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                 )}
                 {hireMeta.skills && hireMeta.skills.length > 0 && (
                   <span style={{ display: 'flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap', marginTop: 2 }}>
-                    <span style={{ fontSize: 12 }}>skills this hire activates:</span>
+                    <span style={{ fontSize: 12 }}>{t('addAgentModal.hire.skills', 'skills this hire activates:')}</span>
                     {hireMeta.skills.map((s) => (
                       <code
                         key={s}
@@ -506,7 +508,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 2 }}>
                       {safe.length > 0 && (
                         <span style={{ display: 'flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: 12 }}>MCP servers (safe, pre-enabled):</span>
+                          <span style={{ fontSize: 12 }}>{t('addAgentModal.hire.mcpSafe', 'MCP servers (safe, pre-enabled):')}</span>
                           {safe.map((id) => (
                             <code key={id} style={{
                               fontFamily: 'var(--cth-font-mono)', fontSize: 12, padding: '0 4px',
@@ -519,7 +521,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                       )}
                       {consent.length > 0 && (
                         <span style={{ display: 'flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: 12 }}>⚠️ MCP (needs your consent — NOT auto-enabled):</span>
+                          <span style={{ fontSize: 12 }}>{t('addAgentModal.hire.mcpConsent', '⚠️ MCP (needs your consent — NOT auto-enabled):')}</span>
                           {consent.map((id) => (
                             <code key={id} style={{
                               fontFamily: 'var(--cth-font-mono)', fontSize: 12, padding: '0 4px',
@@ -529,7 +531,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             }}>{id}</code>
                           ))}
                           <span style={{ fontSize: 11, color: 'var(--cth-ink-700)' }}>
-                            — enable in Settings → MCP after reviewing
+                            {t('addAgentModal.hire.mcpConsentHint', '— enable in Settings → MCP after reviewing')}
                           </span>
                         </span>
                       )}
@@ -565,10 +567,10 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                         display: 'flex', alignItems: 'baseline', gap: 6
                       }}>
                         <span style={{ color: active ? 'var(--cth-ink-900)' : 'var(--cth-ink-500)' }}>{i + 1}</span>
-                        {s.label}
+                        {t(`addAgentModal.section.${s.key}.label`, s.label)}
                       </span>
                       <span style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 11, color: 'var(--cth-ink-500)' }}>
-                        {s.hint}
+                        {t(`addAgentModal.section.${s.key}.hint`, s.hint)}
                       </span>
                     </button>
                   );
@@ -579,7 +581,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
               <div style={{ flex: 1, minWidth: 0, minHeight: 260, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {section === 'identity' && (
                   <>
-                    <Row label="Name">
+                    <Row label={t('addAgentModal.row.name', 'Name')}>
                       <input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -588,7 +590,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                       />
                     </Row>
 
-                    <Row label="Character">
+                    <Row label={t('addAgentModal.row.character', 'Character')}>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         {OFFICE_CAST.map(c => (
                           <button
@@ -615,7 +617,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                       </div>
                     </Row>
 
-                    <Row label="Color">
+                    <Row label={t('addAgentModal.row.color', 'Color')}>
                       <div style={{ display: 'flex', gap: 6 }}>
                         {ACCENTS.map(a => (
                           <button
@@ -640,14 +642,16 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
 
                 {section === 'workspace' && (
                   <>
-                    <Row label="Project">
+                    <Row label={t('addAgentModal.row.project', 'Project')}>
                       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
                         <span style={{ fontSize: 12, color: 'var(--cth-ink-500)' }}>
-                          {repos.length > 0 ? 'Pick a project, or add a new one:' : 'No projects yet — add one to get started:'}
+                          {repos.length > 0
+                            ? t('addAgentModal.project.pick', 'Pick a project, or add a new one:')
+                            : t('addAgentModal.project.none', 'No projects yet — add one to get started:')}
                         </span>
                         <button
                           onClick={addProject}
-                          title="Pick a folder and register it as a project"
+                          title={t('addAgentModal.project.addTitle', 'Pick a folder and register it as a project')}
                           style={{
                             flexShrink: 0, padding: '2px 8px 1px', border: 'none', cursor: 'pointer',
                             background: 'var(--cth-cream-200)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-100)',
@@ -655,7 +659,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             display: 'inline-flex', alignItems: 'center', gap: 4
                           }}
                         >
-                          <Icon name="plus" /> add project
+                          <Icon name="plus" /> {t('addAgentModal.project.add', 'add project')}
                         </button>
                       </div>
                       {repos.length > 0 && (
@@ -686,19 +690,19 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                         <input
                           value={cwd}
                           onChange={(e) => setCwd(e.target.value)}
-                          placeholder="/path/to/your/project"
+                          placeholder={t('addAgentModal.project.placeholder', '/path/to/your/project')}
                           style={{ ...inputStyle, flex: 1, fontFamily: 'var(--cth-font-mono)', fontSize: 13 }}
                         />
                         <PixelButton variant="secondary" size="md" onClick={pickFolder}>
                           <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
-                            <Icon name="folder" /> pick
+                            <Icon name="folder" /> {t('addAgentModal.project.pickButton', 'pick')}
                           </span>
                         </PixelButton>
                       </div>
                       {cwd.trim() && !repos.includes(cwd.trim()) && (
                         <button
                           onClick={() => registerProject(cwd)}
-                          title="Save this folder to your projects so it's a one-click pick next time"
+                          title={t('addAgentModal.project.saveTitle', "Save this folder to your projects so it's a one-click pick next time")}
                           style={{
                             alignSelf: 'flex-start', marginTop: 2,
                             padding: '2px 8px 1px', border: 'none', cursor: 'pointer',
@@ -707,7 +711,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             display: 'inline-flex', alignItems: 'center', gap: 4
                           }}
                         >
-                          <Icon name="plus" /> save as project
+                          <Icon name="plus" /> {t('addAgentModal.project.saveAsProject', 'save as project')}
                         </button>
                       )}
                     </Row>
@@ -721,16 +725,16 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                         style={{ width: 16, height: 16, cursor: resuming ? 'not-allowed' : 'pointer' }}
                       />
                       <span style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 13, color: 'var(--cth-ink-900)' }}>
-                        Git isolation (own worktree)
+                        {t('addAgentModal.gitIsolation', 'Git isolation (own worktree)')}
                       </span>
                     </label>
 
-                    <Row label="Resume session ID (optional)">
+                    <Row label={t('addAgentModal.row.resumeSession', 'Resume session ID (optional)')}>
                       <input
                         value={resumeSessionId}
                         onChange={(e) => { setResumeSessionId(e.target.value); setFolderNote(undefined); }}
                         onBlur={resolveFolderFromSession}
-                        placeholder="paste a Claude session id to continue its conversation"
+                        placeholder={t('addAgentModal.resumeSession.placeholder', 'paste a Claude session id to continue its conversation')}
                         style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)', fontSize: 13 }}
                       />
                       {folderNote && (
@@ -740,7 +744,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                       )}
                       {resuming && (
                         <span style={{ fontFamily: 'var(--cth-font-ui)', fontSize: 12, color: 'var(--cth-ink-700)' }}>
-                          Will resume this session in the chosen folder (git isolation disabled).
+                          {t('addAgentModal.resumeHint', 'Will resume this session in the chosen folder (git isolation disabled).')}
                         </span>
                       )}
                     </Row>
@@ -749,7 +753,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
 
                 {section === 'engine' && (
                   <>
-                    <Row label="Provider">
+                    <Row label={t('addAgentModal.row.provider', 'Provider')}>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         {AGENT_PROVIDER_PRESETS.map((p) => {
                           const active = provider === p.id;
@@ -759,11 +763,11 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                               onClick={() => pickProvider(p.id)}
                               title={
                                 p.id === 'antigravity'
-                                  ? 'Spawn the Antigravity CLI (agy) with a Gemini model'
+                                  ? t('addAgentModal.provider.antigravity', 'Spawn the Antigravity CLI (agy) with a Gemini model')
                                   : p.id === 'codex'
-                                    ? 'Spawn the Codex CLI (codex) without Claude-only flags'
+                                    ? t('addAgentModal.provider.codex', 'Spawn the Codex CLI (codex) without Claude-only flags')
                                     : p.id === 'custom'
-                                      ? 'Run any command — no Claude-only flags'
+                                      ? t('addAgentModal.provider.custom', 'Run any command — no Claude-only flags')
                                       : p.label
                               }
                               style={{
@@ -785,7 +789,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                       </div>
                     </Row>
 
-                    {preset.supportsModel && <Row label="Model">
+                    {preset.supportsModel && <Row label={t('addAgentModal.row.model', 'Model')}>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         {(() => {
                           // An imported hire may name a model newer than this picker's
@@ -794,7 +798,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                           // the command field already carries it either way.
                           const known = modelsForProvider(provider);
                           return model && !known.some((m) => m.id === model)
-                            ? [...known, { id: model, label: `${model} (from hire)` }]
+                            ? [...known, { id: model, label: t('addAgentModal.model.fromHire', '{model} (from hire)', { model }) }]
                             : known;
                         })().map((m) => {
                           const active = (model ?? '') === (m.id ?? '');
@@ -802,7 +806,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             <button
                               key={m.label}
                               onClick={() => pickModel(m.id)}
-                              title={m.id ?? 'CLI default model'}
+                              title={m.id ?? t('addAgentModal.model.cliDefault', 'CLI default model')}
                               style={{
                                 padding: '3px 8px 1px',
                                 background: active ? `var(--cth-${accent}-light)` : 'var(--cth-cream-100)',
@@ -826,10 +830,10 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                         `ollama/<tag>`; provider slugs are identical across engines)
                         and rebuilds the command. */}
                     {hasOssQuickPicks(provider) && (
-                      <Row label="OSS models">
+                      <Row label={t('addAgentModal.row.ossModels', 'OSS models')}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                           <div>
-                            <div style={ossGroupHead}>Local · no key (Ollama / LM Studio)</div>
+                            <div style={ossGroupHead}>{t('addAgentModal.oss.localHead', 'Local · no key (Ollama / LM Studio)')}</div>
                             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                               {OSS_LOCAL_PICKS.map((p) => {
                                 const slug = localSlugFor(provider, p.tag);
@@ -838,7 +842,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                                   <button
                                     key={p.tag}
                                     onClick={() => pickModel(slug)}
-                                    title={`${slug} · needs ~${p.minRam} RAM — pull with: ollama pull ${p.tag}`}
+                                    title={t('addAgentModal.oss.localTitle', '{slug} · needs ~{ram} RAM — pull with: ollama pull {tag}', { slug, ram: p.minRam, tag: p.tag })}
                                     style={ossChip(active, accent)}
                                   >
                                     {p.label}
@@ -848,7 +852,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             </div>
                           </div>
                           <div>
-                            <div style={ossGroupHead}>Via OSS provider · BYOK</div>
+                            <div style={ossGroupHead}>{t('addAgentModal.oss.providerHead', 'Via OSS provider · BYOK')}</div>
                             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                               {OSS_PROVIDER_PICKS.map((p) => {
                                 const active = (model ?? '') === p.slug;
@@ -856,7 +860,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                                   <button
                                     key={p.slug}
                                     onClick={() => pickModel(p.slug)}
-                                    title={`${p.slug} · set ${p.keyEnv} in Settings → AI Engines`}
+                                    title={t('addAgentModal.oss.providerTitle', '{slug} · set {keyEnv} in Settings → AI Engines', { slug: p.slug, keyEnv: p.keyEnv })}
                                     style={ossChip(active, accent)}
                                   >
                                     {p.label}
@@ -871,24 +875,24 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
 
                     {(provider === 'opencode' || provider === 'crush' || provider === 'pi' || provider === 'qwen') && (
                       <div style={{ fontSize: 12, color: 'var(--cth-ink-500)', lineHeight: '16px', margin: '2px 0 6px' }}>
-                        BYOK keys &amp; local endpoints for this engine live in <strong>Settings → AI Engines</strong>.
-                        {' '}New to local models? Read{' '}
+                        {t('addAgentModal.byok.intro', 'BYOK keys & local endpoints for this engine live in')} <strong>{t('addAgentModal.byok.settingsPath', 'Settings → AI Engines')}</strong>.
+                        {' '}{t('addAgentModal.byok.newToLocal', 'New to local models? Read')}{' '}
                         <a
                           href={OSS_BLOG_LINKS.openModels}
                           onClick={(e) => { e.preventDefault(); void window.cth.openExternal(OSS_BLOG_LINKS.openModels); }}
                           style={ossLink}
-                        >run on open models</a>
-                        {' '}or{' '}
+                        >{t('addAgentModal.byok.runOnOpenModels', 'run on open models')}</a>
+                        {' '}{t('common.or', 'or')}{' '}
                         <a
                           href={OSS_BLOG_LINKS.macMini}
                           onClick={(e) => { e.preventDefault(); void window.cth.openExternal(OSS_BLOG_LINKS.macMini); }}
                           style={ossLink}
-                        >set up on a Mac Mini</a>.
-                        {' '}Live end-to-end is pending real model calls (verify on-device).
+                        >{t('addAgentModal.byok.setUpMacMini', 'set up on a Mac Mini')}</a>.
+                        {' '}{t('addAgentModal.byok.pending', 'Live end-to-end is pending real model calls (verify on-device).')}
                       </div>
                     )}
 
-                    <Row label={config.autoMode && preset.autoFlag ? 'Command (auto mode on)' : 'Command'}>
+                    <Row label={config.autoMode && preset.autoFlag ? t('addAgentModal.row.commandAutoMode', 'Command (auto mode on)') : t('addAgentModal.row.command', 'Command')}>
                       <input
                         value={command}
                         onChange={(e) => setCommand(e.target.value)}
@@ -898,7 +902,7 @@ export function AddAgentModal({ onClose, config, onConfigChange }: AddAgentModal
                             : provider === 'codex'
                               ? 'codex'
                               : provider === 'custom'
-                                ? 'your-agent-cli'
+                                ? t('addAgentModal.command.placeholderCustom', 'your-agent-cli')
                                 : 'claude'
                         }
                         style={{ ...inputStyle, fontFamily: 'var(--cth-font-mono)' }}

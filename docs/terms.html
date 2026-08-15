@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page="terms">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,6 +19,16 @@
   document.documentElement.setAttribute('data-theme', t);
 })();
 </script>
+<script>
+// language init — BEFORE first paint. English is canonical, shared with the landing page.
+(function () {
+  var l;
+  try { l = localStorage.getItem('mdf_lang'); } catch (e) {}
+  if (l !== 'fr' && l !== 'en') l = 'en';
+  document.documentElement.setAttribute('lang', l);
+})();
+</script>
+<script src="./i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -68,6 +78,14 @@
   }
   .top-in .back { margin-left: auto; font-size: 0.88rem; color: var(--muted); border: none; }
   .top-in .back:hover { color: var(--accent); }
+  .lang-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 30px; padding: 0 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--muted);
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.04em;
+  }
+  .lang-toggle:hover { border-color: var(--accent-line); color: var(--ink); }
+  .lede .fr-notice { display: block; margin-top: 10px; font-size: 0.85rem; color: var(--faint); }
 
   main { max-width: 820px; margin: 0 auto; padding: 56px 24px 80px; }
 
@@ -149,125 +167,142 @@
   <div class="top-in">
     <img src="./logo.png" alt="" width="30" height="30" />
     <span class="name">MUNDER DIFFLIN</span>
-    <a class="back" href="/">← Back to site</a>
+    <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language / Changer de langue">FR</button>
+    <a class="back" data-i18n="legal.back" href="/">← Back to site</a>
   </div>
 </div>
 
 <main>
-  <div class="eyebrow">Legal</div>
-  <h1>Terms of Service</h1>
-  <div class="dates">Effective 13 August 2026 · Last updated 13 August 2026</div>
+  <div class="eyebrow" data-i18n="legal.eyebrow">Legal</div>
+  <h1 data-i18n="terms.h1">Terms of Service</h1>
+  <div class="dates" data-i18n="terms.dates">Effective 13 August 2026 · Last updated 13 August 2026</div>
 
   <div class="lede">
-    <p><strong>The short version.</strong> Munder Difflin is free, open-source software you run on your own computer. The code is MIT-licensed. The bundled pixel art is not — it carries a non-commercial restriction, which matters if you plan to use the app at work.</p>
-    <p>The app runs AI agents on your machine with your permissions. They can create, change and delete files, run commands, and spend money on the AI subscriptions you connect. <strong>You are responsible for what they do.</strong> The software comes with no warranty of any kind.</p>
+    <p data-i18n-html="terms.lede1"><strong>The short version.</strong> Munder Difflin is free, open-source software you run on your own computer. The code is MIT-licensed. The bundled pixel art is not — it carries a non-commercial restriction, which matters if you plan to use the app at work.</p>
+    <p data-i18n-html="terms.lede2">The app runs AI agents on your machine with your permissions. They can create, change and delete files, run commands, and spend money on the AI subscriptions you connect. <strong>You are responsible for what they do.</strong> The software comes with no warranty of any kind.</p>
+    <span class="fr-notice" data-i18n="legal.frNotice">The English version of this document is authoritative; the French translation is provided for convenience and may not always be perfectly up to date.</span>
   </div>
 
   <div class="toc">
-    <div class="toc-h">On this page</div>
+    <div class="toc-h" data-i18n="legal.toc">On this page</div>
     <ol>
-      <li><a href="#accept">Agreeing to these terms</a></li>
-      <li><a href="#licence">Licence — code and art</a></li>
-      <li><a href="#agents">What the software does</a></li>
-      <li><a href="#responsibility">Your responsibility</a></li>
-      <li><a href="#keys">Your accounts and keys</a></li>
-      <li><a href="#acceptable">Acceptable use</a></li>
-      <li><a href="#paid">Paid services</a></li>
-      <li><a href="#donations">Donations</a></li>
-      <li><a href="#warranty">No warranty</a></li>
-      <li><a href="#liability">Limitation of liability</a></li>
-      <li><a href="#trademarks">Trademarks and parody</a></li>
-      <li><a href="#changes">Changes and termination</a></li>
-      <li><a href="#law">Governing law</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#accept" data-i18n="terms.toc.accept">Agreeing to these terms</a></li>
+      <li><a href="#licence" data-i18n="terms.toc.licence">Licence — code and art</a></li>
+      <li><a href="#agents" data-i18n="terms.toc.agents">What the software does</a></li>
+      <li><a href="#responsibility" data-i18n="terms.toc.responsibility">Your responsibility</a></li>
+      <li><a href="#keys" data-i18n="terms.toc.keys">Your accounts and keys</a></li>
+      <li><a href="#acceptable" data-i18n="terms.toc.acceptable">Acceptable use</a></li>
+      <li><a href="#paid" data-i18n="terms.toc.paid">Paid services</a></li>
+      <li><a href="#donations" data-i18n="terms.toc.donations">Donations</a></li>
+      <li><a href="#warranty" data-i18n="terms.toc.warranty">No warranty</a></li>
+      <li><a href="#liability" data-i18n="terms.toc.liability">Limitation of liability</a></li>
+      <li><a href="#trademarks" data-i18n="terms.toc.trademarks">Trademarks and parody</a></li>
+      <li><a href="#changes" data-i18n="terms.toc.changes">Changes and termination</a></li>
+      <li><a href="#law" data-i18n="terms.toc.law">Governing law</a></li>
+      <li><a href="#contact" data-i18n="terms.toc.contact">Contact</a></li>
     </ol>
   </div>
 
-  <h2 id="accept"><span class="num">01</span>Agreeing to these terms</h2>
-  <p>By downloading, installing or using Munder Difflin ("the software"), or by using this website, you agree to these terms. If you do not agree, do not use it.</p>
-  <p>The software is maintained by <strong>Chaitanya Giri</strong>, an individual developer based in India. "We" and "us" mean that one person; there is no company.</p>
+  <h2 id="accept"><span class="num">01</span><span data-i18n="terms.s01.h2">Agreeing to these terms</span></h2>
+  <p data-i18n-html="terms.s01.p1">By downloading, installing or using Munder Difflin ("the software"), or by using this website, you agree to these terms. If you do not agree, do not use it.</p>
+  <p data-i18n-html="terms.s01.p2">The software is maintained by <strong>Chaitanya Giri</strong>, an individual developer based in India. "We" and "us" mean that one person; there is no company.</p>
 
-  <h2 id="licence"><span class="num">02</span>Licence — code and art</h2>
-  <p>These are two different licences covering two different parts of the same download, and the difference is easy to miss.</p>
+  <h2 id="licence"><span class="num">02</span><span data-i18n="terms.s02.h2">Licence — code and art</span></h2>
+  <p data-i18n="terms.s02.p1">These are two different licences covering two different parts of the same download, and the difference is easy to miss.</p>
 
-  <h3>The source code — MIT</h3>
-  <p>All source code is released under the <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/LICENSE" target="_blank" rel="noopener">MIT Licence</a>. You may use, copy, modify, merge, publish, distribute, sublicense and sell copies of it, subject to including the copyright notice. Nothing on this page reduces the rights the MIT Licence grants you over the code.</p>
+  <h3 data-i18n="terms.s02.h3a">The source code — MIT</h3>
+  <p data-i18n-html="terms.s02.p2">All source code is released under the <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/LICENSE" target="_blank" rel="noopener">MIT Licence</a>. You may use, copy, modify, merge, publish, distribute, sublicense and sell copies of it, subject to including the copyright notice. Nothing on this page reduces the rights the MIT Licence grants you over the code.</p>
 
-  <h3>The bundled pixel art — non-commercial only</h3>
+  <h3 data-i18n="terms.s02.h3b">The bundled pixel art — non-commercial only</h3>
   <div class="note warn">
-    <span class="note-h">Read this before using Munder Difflin at work</span>
-    <p>The pixel-art assets bundled with the app — tilesets, maps and character sheets under <code>src/renderer/src/assets/</code>, and the recoloured sprites derived from them — originate from <strong>LimeZu</strong> and are distributed under the <strong>LimeZu FREE VERSION licence, which permits non-commercial use only</strong>. That restriction is not ours to waive.</p>
-    <p>To use the software commercially, you must either replace those assets or obtain a paid LimeZu licence. See <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/src/renderer/src/assets/ATTRIBUTION.md" target="_blank" rel="noopener">ATTRIBUTION.md</a> for the detail.</p>
+    <span class="note-h" data-i18n="terms.s02.warnH">Read this before using Munder Difflin at work</span>
+    <p data-i18n-html="terms.s02.warn1">The pixel-art assets bundled with the app — tilesets, maps and character sheets under <code>src/renderer/src/assets/</code>, and the recoloured sprites derived from them — originate from <strong>LimeZu</strong> and are distributed under the <strong>LimeZu FREE VERSION licence, which permits non-commercial use only</strong>. That restriction is not ours to waive.</p>
+    <p data-i18n-html="terms.s02.warn2">To use the software commercially, you must either replace those assets or obtain a paid LimeZu licence. See <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/src/renderer/src/assets/ATTRIBUTION.md" target="_blank" rel="noopener">ATTRIBUTION.md</a> for the detail.</p>
   </div>
-  <p>In short: the code is yours to do almost anything with; the artwork that ships alongside it is not. If you are unsure whether your use counts as commercial, assume it does and clear the asset licence first.</p>
+  <p data-i18n="terms.s02.p3">In short: the code is yours to do almost anything with; the artwork that ships alongside it is not. If you are unsure whether your use counts as commercial, assume it does and clear the asset licence first.</p>
 
-  <h2 id="agents"><span class="num">03</span>What the software does</h2>
-  <p>Munder Difflin is a harness. It does not contain an AI model and it does not think for itself. It starts and supervises command-line AI agents that are already installed on your computer — Claude Code, Codex, Copilot and others — each in a real pseudo-terminal, and gives them memory, messaging, scheduling and a shared workspace.</p>
-  <p>Those agents run as <strong>you</strong>, with your operating-system permissions, against your files and your accounts. The software also supports autonomous operation, in which agents continue working without a person watching each step.</p>
+  <h2 id="agents"><span class="num">03</span><span data-i18n="terms.s03.h2">What the software does</span></h2>
+  <p data-i18n-html="terms.s03.p1">Munder Difflin is a harness. It does not contain an AI model and it does not think for itself. It starts and supervises command-line AI agents that are already installed on your computer — Claude Code, Codex, Copilot and others — each in a real pseudo-terminal, and gives them memory, messaging, scheduling and a shared workspace.</p>
+  <p data-i18n-html="terms.s03.p2">Those agents run as <strong>you</strong>, with your operating-system permissions, against your files and your accounts. The software also supports autonomous operation, in which agents continue working without a person watching each step.</p>
 
-  <h2 id="responsibility"><span class="num">04</span>Your responsibility</h2>
-  <p>Because agents act with your permissions, they can do anything you can do. That includes:</p>
+  <h2 id="responsibility"><span class="num">04</span><span data-i18n="terms.s04.h2">Your responsibility</span></h2>
+  <p data-i18n="terms.s04.p1">Because agents act with your permissions, they can do anything you can do. That includes:</p>
   <ul>
-    <li>Creating, modifying and <strong>permanently deleting</strong> files and repositories</li>
-    <li>Running arbitrary shell commands, installing software, and changing system state</li>
-    <li>Making network requests, and pushing to remote repositories</li>
-    <li><strong>Consuming paid quota</strong> on the AI subscriptions and API keys you connect, including while you are away</li>
+    <li data-i18n-html="terms.s04.li1">Creating, modifying and <strong>permanently deleting</strong> files and repositories</li>
+    <li data-i18n="terms.s04.li2">Running arbitrary shell commands, installing software, and changing system state</li>
+    <li data-i18n="terms.s04.li3">Making network requests, and pushing to remote repositories</li>
+    <li data-i18n-html="terms.s04.li4"><strong>Consuming paid quota</strong> on the AI subscriptions and API keys you connect, including while you are away</li>
   </ul>
-  <p>You are solely responsible for everything done by agents you run, for the instructions you give them, and for the consequences — including data loss and charges from third-party providers.</p>
+  <p data-i18n="terms.s04.p2">You are solely responsible for everything done by agents you run, for the instructions you give them, and for the consequences — including data loss and charges from third-party providers.</p>
   <div class="note">
-    <p>Autonomy controls, spend budgets, human-in-the-loop confirmation and the circuit breaker exist to reduce this risk and you are strongly encouraged to use them. They are safeguards, <strong>not guarantees</strong>. Keep backups, use version control, and do not point autonomous agents at anything you cannot afford to lose.</p>
+    <p data-i18n-html="terms.s04.note">Autonomy controls, spend budgets, human-in-the-loop confirmation and the circuit breaker exist to reduce this risk and you are strongly encouraged to use them. They are safeguards, <strong>not guarantees</strong>. Keep backups, use version control, and do not point autonomous agents at anything you cannot afford to lose.</p>
   </div>
 
-  <h2 id="keys"><span class="num">05</span>Your accounts and keys</h2>
-  <p>The software is bring-your-own-key. It drives subscriptions and API keys that you own and supply. You must comply with the terms of every provider you connect — Anthropic, OpenAI, xAI, Google, Moonshot, Slack and any others — and their terms govern that usage, not ours.</p>
-  <p>Keys and secrets you enter are stored locally on your machine. Keeping them safe, rotating them and revoking them is your responsibility. We never receive them.</p>
+  <h2 id="keys"><span class="num">05</span><span data-i18n="terms.s05.h2">Your accounts and keys</span></h2>
+  <p data-i18n="terms.s05.p1">The software is bring-your-own-key. It drives subscriptions and API keys that you own and supply. You must comply with the terms of every provider you connect — Anthropic, OpenAI, xAI, Google, Moonshot, Slack and any others — and their terms govern that usage, not ours.</p>
+  <p data-i18n="terms.s05.p2">Keys and secrets you enter are stored locally on your machine. Keeping them safe, rotating them and revoking them is your responsibility. We never receive them.</p>
 
-  <h2 id="acceptable"><span class="num">06</span>Acceptable use</h2>
-  <p>Do not use Munder Difflin to break the law, to access systems you are not authorised to access, to infringe anyone's rights, or to build or operate anything designed to cause harm. Do not use it in a way that violates the terms of the AI providers it drives.</p>
-  <p>The software runs locally and we have no technical ability to monitor or restrict your use of it. This clause states an obligation you accept, not a control we enforce.</p>
+  <h2 id="acceptable"><span class="num">06</span><span data-i18n="terms.s06.h2">Acceptable use</span></h2>
+  <p data-i18n="terms.s06.p1">Do not use Munder Difflin to break the law, to access systems you are not authorised to access, to infringe anyone's rights, or to build or operate anything designed to cause harm. Do not use it in a way that violates the terms of the AI providers it drives.</p>
+  <p data-i18n="terms.s06.p2">The software runs locally and we have no technical ability to monitor or restrict your use of it. This clause states an obligation you accept, not a control we enforce.</p>
 
-  <h2 id="paid"><span class="num">07</span>Paid services</h2>
-  <p>The application itself is free and always will be. Two optional services are described on the website — <strong>Private Cloud</strong> (a dedicated sandbox environment per clone) and <strong>Private Network</strong> (end-to-end encrypted clone-to-clone messaging for teams).</p>
-  <p>These are arranged by contact rather than sold from the site, are not generally available, and nothing on the website is an offer to contract. Where such a service is provided, a separate written agreement will govern it and will take precedence over these terms for that service. Descriptions of planned functionality are not commitments to deliver it on any timetable.</p>
+  <h2 id="paid"><span class="num">07</span><span data-i18n="terms.s07.h2">Paid services</span></h2>
+  <p data-i18n-html="terms.s07.p1">The application itself is free and always will be. Two optional services are described on the website — <strong>Private Cloud</strong> (a dedicated sandbox environment per clone) and <strong>Private Network</strong> (end-to-end encrypted clone-to-clone messaging for teams).</p>
+  <p data-i18n="terms.s07.p2">These are arranged by contact rather than sold from the site, are not generally available, and nothing on the website is an offer to contract. Where such a service is provided, a separate written agreement will govern it and will take precedence over these terms for that service. Descriptions of planned functionality are not commitments to deliver it on any timetable.</p>
 
-  <h2 id="donations"><span class="num">08</span>Donations</h2>
-  <p>Voluntary donations support continued development. A donation is a gift, not a purchase: it buys no licence, no feature, no support entitlement and no influence over the roadmap, and it is non-refundable. Payments are processed by Razorpay under their terms.</p>
+  <h2 id="donations"><span class="num">08</span><span data-i18n="terms.s08.h2">Donations</span></h2>
+  <p data-i18n="terms.s08.p1">Voluntary donations support continued development. A donation is a gift, not a purchase: it buys no licence, no feature, no support entitlement and no influence over the roadmap, and it is non-refundable. Payments are processed by Razorpay under their terms.</p>
 
-  <h2 id="warranty"><span class="num">09</span>No warranty</h2>
-  <p>The software is provided <strong>"as is", without warranty of any kind</strong>, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non-infringement. We do not warrant that it will be uninterrupted, error-free, or that it will not lose or damage data.</p>
-  <p>This restates the disclaimer in the MIT Licence and applies with equal force to this website and to any documentation.</p>
+  <h2 id="warranty"><span class="num">09</span><span data-i18n="terms.s09.h2">No warranty</span></h2>
+  <p data-i18n-html="terms.s09.p1">The software is provided <strong>"as is", without warranty of any kind</strong>, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non-infringement. We do not warrant that it will be uninterrupted, error-free, or that it will not lose or damage data.</p>
+  <p data-i18n="terms.s09.p2">This restates the disclaimer in the MIT Licence and applies with equal force to this website and to any documentation.</p>
 
-  <h2 id="liability"><span class="num">10</span>Limitation of liability</h2>
-  <p>To the maximum extent permitted by law, the author shall not be liable for any claim, damages or other liability — whether in contract, tort or otherwise — arising from or in connection with the software or its use, including without limitation lost data, lost profits, lost work, corrupted repositories, unauthorised actions taken by agents, or charges incurred with third-party AI providers.</p>
-  <p>Some jurisdictions do not allow the exclusion of certain warranties or liabilities; where that is so, the exclusions above apply only to the extent permitted.</p>
+  <h2 id="liability"><span class="num">10</span><span data-i18n="terms.s10.h2">Limitation of liability</span></h2>
+  <p data-i18n="terms.s10.p1">To the maximum extent permitted by law, the author shall not be liable for any claim, damages or other liability — whether in contract, tort or otherwise — arising from or in connection with the software or its use, including without limitation lost data, lost profits, lost work, corrupted repositories, unauthorised actions taken by agents, or charges incurred with third-party AI providers.</p>
+  <p data-i18n="terms.s10.p2">Some jurisdictions do not allow the exclusion of certain warranties or liabilities; where that is so, the exclusions above apply only to the extent permitted.</p>
 
-  <h2 id="trademarks"><span class="num">11</span>Trademarks and parody</h2>
-  <p>Munder Difflin is an affectionate parody. It is <strong>not affiliated with, endorsed by or connected to</strong> NBCUniversal, <em>The Office</em>, or the fictional Dunder Mifflin Paper Company. All third-party names, trademarks and logos referenced — including those of the AI providers the software drives — belong to their respective owners and are used for identification only.</p>
+  <h2 id="trademarks"><span class="num">11</span><span data-i18n="terms.s11.h2">Trademarks and parody</span></h2>
+  <p data-i18n-html="terms.s11.p1">Munder Difflin is an affectionate parody. It is <strong>not affiliated with, endorsed by or connected to</strong> NBCUniversal, <em>The Office</em>, or the fictional Dunder Mifflin Paper Company. All third-party names, trademarks and logos referenced — including those of the AI providers the software drives — belong to their respective owners and are used for identification only.</p>
 
-  <h2 id="changes"><span class="num">12</span>Changes and termination</h2>
-  <p>These terms may change; the date at the top will change with them, and the full history is public in the repository. Continuing to use the software after a change means you accept the revised terms.</p>
-  <p>Development may slow, change direction or stop at any time, and releases may be modified or withdrawn. Because the software is open source and runs entirely on your machine, a copy you already have keeps working regardless — and you or anyone else may fork and continue it under the MIT Licence.</p>
+  <h2 id="changes"><span class="num">12</span><span data-i18n="terms.s12.h2">Changes and termination</span></h2>
+  <p data-i18n="terms.s12.p1">These terms may change; the date at the top will change with them, and the full history is public in the repository. Continuing to use the software after a change means you accept the revised terms.</p>
+  <p data-i18n="terms.s12.p2">Development may slow, change direction or stop at any time, and releases may be modified or withdrawn. Because the software is open source and runs entirely on your machine, a copy you already have keeps working regardless — and you or anyone else may fork and continue it under the MIT Licence.</p>
 
-  <h2 id="law"><span class="num">13</span>Governing law</h2>
-  <p>These terms are governed by the laws of India, and the courts of India shall have jurisdiction over any dispute arising from them, without prejudice to any mandatory consumer protections available to you where you live.</p>
+  <h2 id="law"><span class="num">13</span><span data-i18n="terms.s13.h2">Governing law</span></h2>
+  <p data-i18n="terms.s13.p1">These terms are governed by the laws of India, and the courts of India shall have jurisdiction over any dispute arising from them, without prejudice to any mandatory consumer protections available to you where you live.</p>
 
-  <h2 id="contact"><span class="num">14</span>Contact</h2>
-  <p>Questions about these terms: <a href="mailto:girichaitanya11@gmail.com">girichaitanya11@gmail.com</a>, or open an issue on <a href="https://github.com/chaitanyagiri/munder-difflin/issues" target="_blank" rel="noopener">GitHub</a>. Security reports have their own route — see <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>.</p>
-  <p>See also the <a href="/privacy.html">Privacy Policy</a>.</p>
+  <h2 id="contact"><span class="num">14</span><span data-i18n="legal.contact">Contact</span></h2>
+  <p data-i18n-html="terms.s14.p1">Questions about these terms: <a href="mailto:girichaitanya11@gmail.com">girichaitanya11@gmail.com</a>, or open an issue on <a href="https://github.com/chaitanyagiri/munder-difflin/issues" target="_blank" rel="noopener">GitHub</a>. Security reports have their own route — see <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>.</p>
+  <p data-i18n-html="terms.s14.p2">See also the <a href="/privacy.html">Privacy Policy</a>.</p>
 </main>
 
 <footer>
   <div class="foot-in">
-    <span>© 2026 Munder Difflin — free &amp; open source</span>
+    <span data-i18n="foot.copy">© 2026 Munder Difflin — free &amp; open source</span>
     <div class="links">
-      <a href="/">Home</a>
-      <a href="/terms.html">Terms</a>
-      <a href="/privacy.html">Privacy</a>
+      <a href="/" data-i18n="foot.home">Home</a>
+      <a href="/terms.html" data-i18n="foot.terms">Terms</a>
+      <a href="/privacy.html" data-i18n="foot.privacy">Privacy</a>
       <a href="https://github.com/chaitanyagiri/munder-difflin" target="_blank" rel="noopener">GitHub</a>
-      <a href="mailto:girichaitanya11@gmail.com">Contact</a>
+      <a href="mailto:girichaitanya11@gmail.com" data-i18n="foot.contact">Contact</a>
     </div>
   </div>
 </footer>
 
+<script>
+  // language toggle — shares mdf_lang with the landing page
+  (function () {
+    var btn = document.getElementById('langToggle');
+    if (!btn || !window.MDF_I18N) return;
+    function label(lang) { btn.textContent = lang === 'fr' ? 'EN' : 'FR'; }
+    label(window.MDF_I18N.getLang());
+    btn.addEventListener('click', function () {
+      var next = window.MDF_I18N.getLang() === 'fr' ? 'en' : 'fr';
+      window.MDF_I18N.setLang(next);
+      window.MDF_I18N.apply(next);
+      label(next);
+    });
+  })();
+</script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import { RealtimeMichaelToggle } from './RealtimeMichaelToggle';
 import { CostHud } from '@/realtime/CostHud';
 import { AccentColorName } from '@/design/tokens';
 import { OfficeCharacterName } from '@/scene/office/cast';
+import { useT } from '@/i18n';
 
 export interface AgentCardProps {
   name: string;
@@ -55,6 +56,7 @@ export function AgentCard({
   contextTokens, contextLimit, selected, isGod, onClick,
   doingCount = 0, onTaskNoteClick, draggable, note, onEditNote
 }: AgentCardProps) {
+  const t = useT();
   const [hover, setHover] = useState(false);
   const typing = useHasTerminalDraft(ptyId);
   // The god is always framed (stands out from the row); others only when selected.
@@ -67,8 +69,10 @@ export function AgentCard({
     : progress >= 6 ? 'var(--cth-lemon)'
       : `var(--cth-${accent})`;
   const gaugeTitle = contextTokens !== undefined && contextLimit
-    ? `Context: ${fmtK(contextTokens)} / ${fmtK(contextLimit)} tokens (${Math.round((contextTokens / contextLimit) * 100)}%)`
-    : 'Context gauge — fills once the agent reports activity';
+    ? t('agentCard.gauge.title', 'Context: {used} / {total} tokens ({pct}%)', {
+        used: fmtK(contextTokens), total: fmtK(contextLimit), pct: Math.round((contextTokens / contextLimit) * 100)
+      })
+    : t('agentCard.gauge.empty', 'Context gauge — fills once the agent reports activity');
 
   const width = isGod ? 216 : 196;
   const height = isGod ? 86 : 76;
@@ -101,7 +105,9 @@ export function AgentCard({
           actively DOING a ledger task. Click → the task's detail overlay. */}
       {doingCount > 0 && (
         <span
-          title={`actively working ${doingCount} task${doingCount === 1 ? '' : 's'} — click to open`}
+          title={doingCount === 1
+            ? t('agentCard.doingNote.one', 'actively working {n} task — click to open', { n: doingCount })
+            : t('agentCard.doingNote.many', 'actively working {n} tasks — click to open', { n: doingCount })}
           onClick={(e) => { e.stopPropagation(); onTaskNoteClick?.(); }}
           style={{
             position: 'absolute', right: -4, bottom: -5, zIndex: 2,
@@ -153,7 +159,7 @@ export function AgentCard({
                     fontFamily: 'var(--cth-font-display)', fontSize: 7, lineHeight: '11px',
                     background: `var(--cth-${accent})`, color: 'var(--cth-ink-900)',
                     padding: '1px 4px 0', flexShrink: 0
-                  }}>BOSS</span>
+                  }}>{t('agentCard.boss', 'BOSS')}</span>
                 )}
               </span>
               <PixelBadge status={typing ? 'typing' : status} />
@@ -161,7 +167,7 @@ export function AgentCard({
 
             {/* Context line: action while working, repo while idle. */}
             <div
-              title={`${project}${action && status !== 'idle' ? ` — ${action}` : ''}`}
+              title={action && status !== 'idle' ? t('agentCard.infoLine.withAction', '{project} — {action}', { project, action }) : project}
               style={{
                 fontSize: 11, lineHeight: '14px',
                 color: 'var(--cth-ink-500)',
@@ -202,8 +208,8 @@ export function AgentCard({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); onEditNote(); }
                     }}
-                    title={note ? 'Edit private note' : 'Add private note'}
-                    aria-label={`Edit note for ${name}`}
+                    title={note ? t('agentCard.note.edit', 'Edit private note') : t('agentCard.note.add', 'Add private note')}
+                    aria-label={t('agentCard.note.editAria', 'Edit note for {name}', { name })}
                     style={{
                       flexShrink: 0, width: 15, height: 14,
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',

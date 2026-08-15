@@ -299,6 +299,10 @@ export interface HarnessConfig {
    *  `tvShowOffices` is on; otherwise the office theme is used. Unbuilt show
    *  themes fall back to 'office' in the loader. */
   officeTheme?: 'office' | 'friends' | 'brooklyn99' | 'siliconvalley' | 'got' | 'hogwarts';
+  /** UI display language for the renderer (src/renderer/src/i18n). Main-process
+   *  strings (tray menu, native dialogs) are NOT covered — English only, for now.
+   *  Default 'en'. */
+  language?: 'en' | 'fr';
   /** Per-CLI-provider local/self-hosted base URL (Ollama/LM Studio/vLLM, …) for the
    *  OpenCode/Crush/pi/qwen engines; applied at spawn (config-injection or proxy
    *  upstream). API KEYS are NOT stored here — they live write-only in the secret
@@ -430,6 +434,7 @@ const DEFAULTS: HarnessConfig = {
   multiWindow: true,
   tvShowOffices: false,
   officeTheme: 'office',
+  language: 'en',
   slackEnabled: false,
   slackSigningSecret: undefined,
   slackBotToken: undefined,

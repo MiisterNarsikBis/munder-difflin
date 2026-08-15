@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-i18n-page="wall">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,6 +29,16 @@
     document.documentElement.setAttribute('data-theme', t);
   })();
 </script>
+<script>
+  // language init — BEFORE first paint. English is canonical. Shares mdf_lang with the landing page.
+  (function () {
+    var l;
+    try { l = localStorage.getItem('mdf_lang'); } catch (e) {}
+    if (l !== 'fr' && l !== 'en') l = 'en';
+    document.documentElement.setAttribute('lang', l);
+  })();
+</script>
+<script src="./i18n.js"></script>
 <style>
   /* Tokens mirror docs/index.html design system v2 — keep in lockstep. */
   :root {
@@ -156,6 +166,13 @@
   .theme-toggle svg { width: 17px; height: 17px; }
   html[data-theme="light"] .theme-toggle .ic-sun { display: none; }
   html:not([data-theme="light"]) .theme-toggle .ic-moon { display: none; }
+  .lang-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 34px; padding: 0 10px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--muted);
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.76rem; letter-spacing: 0.04em;
+  }
+  .lang-toggle:hover { border-color: var(--accent-line); color: var(--ink); }
   @media (max-width: 560px) { .nav-links .txt { display: none; } }
   @media (max-width: 520px) { .brand span { display: none; } }
 
@@ -283,33 +300,34 @@
       <span>MUNDER&nbsp;DIFFLIN</span>
     </a>
     <div class="nav-links">
-      <a class="txt" href="/#pricing">Pricing</a>
-      <a class="txt" href="/blog/">Blog</a>
+      <a class="txt" data-i18n="nav.pricing" href="/#pricing">Pricing</a>
+      <a class="txt" data-i18n="nav.blog" href="/blog/">Blog</a>
+      <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language / Changer de langue">FR</button>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle day / night theme"><svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.6"/><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg><svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.8A8.8 8.8 0 0 1 9.2 3.4a8.8 8.8 0 1 0 11.4 11.4Z"/></svg></button>
-      <a class="btn primary sm" href="/#download"><span>⤓</span> Download</a>
+      <a class="btn primary sm" href="/#download"><span>⤓</span> <span data-i18n="nav.download">Download</span></a>
     </div>
   </div>
 </nav>
 
 <header class="hall">
   <div class="wrap center">
-    <span class="kicker">THE FOUNDERS' WALL</span>
-    <h1>The people who keep the lights on.</h1>
+    <span class="kicker" data-i18n="wall.kicker">THE FOUNDERS' WALL</span>
+    <h1 data-i18n="wall.h1">The people who keep the lights on.</h1>
     <p class="lead">
-      Munder Difflin is free and open source, for everyone, forever. That's possible
-      because of the people on this wall — <b id="wallCount">the Founding Supporters</b>.
-      One brass plaque each. Permanent.
+      <span data-i18n="wall.lead1">Munder Difflin is free and open source, for everyone, forever. That's possible
+      because of the people on this wall —</span> <b id="wallCount">the Founding Supporters</b>.
+      <span data-i18n="wall.lead2">One brass plaque each. Permanent.</span>
     </p>
 
     <div class="wallboard">
       <div class="wall-sign">
-        <span>MUNDER DIFFLIN · EST. 2026</span>
-        <span><b>FOUNDING SUPPORTERS</b></span>
+        <span data-i18n="wall.sign1">MUNDER DIFFLIN · EST. 2026</span>
+        <span><b data-i18n="wall.sign2">FOUNDING SUPPORTERS</b></span>
       </div>
       <div class="plaques" id="plaques">
         <!-- plaques render here from wall-data.json; noscript/fetch-fail fallback below -->
       </div>
-      <div class="wall-note" id="wallNote">Names appear within 24 hours of becoming a Founding Supporter.</div>
+      <div class="wall-note" id="wallNote" data-i18n="wall.note">Names appear within 24 hours of becoming a Founding Supporter.</div>
     </div>
   </div>
 </header>
@@ -317,18 +335,18 @@
 <section class="join">
   <div class="wrap">
     <div class="join-card">
-      <h2>Put your name on the wall.</h2>
-      <span class="price">$20 · ONE TIME</span>
-      <p>A permanent engraved plaque on this wall. Munder Difflin stays free
+      <h2 data-i18n="wall.join.h2">Put your name on the wall.</h2>
+      <span class="price" data-i18n="wall.join.price">$20 · ONE TIME</span>
+      <p data-i18n="wall.join.p">A permanent engraved plaque on this wall. Munder Difflin stays free
       for everyone — this is what keeps it that way.</p>
       <div class="btn-row">
-        <a class="btn primary lg" data-support="wall" href="https://rzp.io/rzp/munder-difflin" target="_blank" rel="noopener">Get on the wall</a>
+        <a class="btn primary lg" data-support="wall" href="https://rzp.io/rzp/munder-difflin" target="_blank" rel="noopener" data-i18n="wall.join.cta">Get on the wall</a>
       </div>
-      <span class="fine">Type the name you want engraved into the <b>“Name (as you want it
+      <span class="fine" data-i18n-html="wall.join.fine">Type the name you want engraved into the <b>“Name (as you want it
       engraved)”</b> field on the Razorpay page — it appears here within 24 hours.
       Prefer no plaque? Write “Anonymous”.</span>
     </div>
-    <p class="legal">A wall listing is a one-time purchase of a recognition service —
+    <p class="legal" data-i18n-html="wall.legal">A wall listing is a one-time purchase of a recognition service —
     a permanent listing on this page — not a donation.
     Payments are processed by Razorpay in USD.
     Questions? <a href="mailto:girichaitanya11@gmail.com">girichaitanya11@gmail.com</a></p>
@@ -337,14 +355,14 @@
 
 <footer>
   <div class="foot-in">
-    <span>© 2026 Munder Difflin — free &amp; open source</span>
+    <span data-i18n="foot.copy">© 2026 Munder Difflin — free &amp; open source</span>
     <div class="foot-links">
-      <a href="/">Home</a>
+      <a href="/" data-i18n="foot.home">Home</a>
       <a href="https://github.com/chaitanyagiri/munder-difflin" target="_blank" rel="noopener">GitHub</a>
-      <a href="/blog/">Blog</a>
-      <a href="/#pricing">Pricing</a>
-      <a href="/terms.html">Terms</a>
-      <a href="/privacy.html">Privacy</a>
+      <a href="/blog/" data-i18n="nav.blog">Blog</a>
+      <a href="/#pricing" data-i18n="nav.pricing">Pricing</a>
+      <a href="/terms.html" data-i18n="foot.terms">Terms</a>
+      <a href="/privacy.html" data-i18n="foot.privacy">Privacy</a>
     </div>
   </div>
 </footer>
@@ -362,14 +380,37 @@
     });
   })();
 
+  // language toggle — shares mdf_lang with the landing page
+  (function () {
+    var btn = document.getElementById('langToggle');
+    if (!btn || !window.MDF_I18N) return;
+    function label(lang) { btn.textContent = lang === 'fr' ? 'EN' : 'FR'; }
+    label(window.MDF_I18N.getLang());
+    btn.addEventListener('click', function () {
+      var next = window.MDF_I18N.getLang() === 'fr' ? 'en' : 'fr';
+      window.MDF_I18N.setLang(next);
+      window.MDF_I18N.apply(next);
+      label(next);
+      renderWall();
+    });
+  })();
+
   // ── the wall ──────────────────────────────────────────────────────────────
   // Renders wall-data.json. Sanitized by construction: names/dates become TEXT
   // NODES only (never innerHTML), links must be https:, and every link is
   // rel="nofollow noopener". A malformed JSON never blanks the page.
-  (function () {
+  var renderWall = (function () {
     var grid = document.getElementById('plaques');
-    var countEl = document.getElementById('wallCount');
-    if (!grid) return;
+    var lastData = null; // re-rendered on language toggle without re-fetching
+    // #wallCount lives inside the lead paragraph, which the language toggle
+    // retranslates via innerHTML — that recreates the node, so it is re-queried
+    // fresh on every render() call rather than cached once.
+
+    function t(key) {
+      var lang = window.MDF_I18N ? window.MDF_I18N.getLang() : 'en';
+      var dict = (window.MDF_FR && window.MDF_FR.wall) || {};
+      return (lang === 'fr' && dict[key] !== undefined) ? dict[key] : null;
+    }
 
     function pad3(n) { return ('00' + n).slice(-3); }
 
@@ -380,11 +421,11 @@
       a.target = '_blank'; a.rel = 'noopener';
       a.setAttribute('data-support', 'wall');
       var no = document.createElement('span'); no.className = 'no';
-      no.textContent = 'PLAQUE Nº ' + pad3(n) + ' · OPEN';
+      no.textContent = (t('plaque.open') || 'PLAQUE Nº {n} · OPEN').replace('{n}', pad3(n));
       var nm = document.createElement('span'); nm.className = 'nm';
-      nm.textContent = 'Your name here';
+      nm.textContent = t('plaque.yourNameHere') || 'Your name here';
       var dt = document.createElement('span'); dt.className = 'dt';
-      dt.textContent = '→ become a Founding Supporter';
+      dt.textContent = t('plaque.become') || '→ become a Founding Supporter';
       a.appendChild(no); a.appendChild(nm); a.appendChild(dt);
       return a;
     }
@@ -393,10 +434,10 @@
       var el = document.createElement('div');
       el.className = 'plaque';
       var no = document.createElement('span'); no.className = 'no';
-      no.textContent = 'FOUNDING SUPPORTER · Nº ' + pad3(n);
+      no.textContent = (t('plaque.founding') || 'FOUNDING SUPPORTER · Nº {n}').replace('{n}', pad3(n));
       el.appendChild(no);
 
-      var name = String(entry.name || '').trim() || 'Anonymous';
+      var name = String(entry.name || '').trim() || (t('plaque.anonymous') || 'Anonymous');
       var link = typeof entry.link === 'string' ? entry.link.trim() : '';
       var nm;
       if (/^https:\/\//i.test(link)) {
@@ -413,14 +454,16 @@
 
       if (entry.date) {
         var dt = document.createElement('span'); dt.className = 'dt';
-        dt.textContent = 'SINCE ' + String(entry.date);
+        dt.textContent = (t('plaque.since') || 'SINCE {d}').replace('{d}', String(entry.date));
         el.appendChild(dt);
       }
       return el;
     }
 
     function render(data) {
-      var list = Array.isArray(data) ? data : [];
+      if (data !== undefined) lastData = data;
+      var list = Array.isArray(lastData) ? lastData : [];
+      if (!grid) return;
       grid.textContent = '';
       // join order, oldest first: Nº 001 at the top, counting down the wall,
       // with the next open slot last — the wall reads as a numbered queue.
@@ -428,23 +471,28 @@
         try { grid.appendChild(plaque(list[i], i + 1)); } catch (e) { /* skip a bad entry, keep the wall up */ }
       }
       grid.appendChild(openSlot(list.length + 1));
+      var countEl = document.getElementById('wallCount');
       if (countEl) {
-        countEl.textContent = list.length === 1
-          ? '1 Founding Supporter'
-          : list.length + ' Founding Supporters';
-        if (list.length === 0) countEl.textContent = 'the Founding Supporters';
+        if (list.length === 0) countEl.textContent = t('plaque.countZero') || 'the Founding Supporters';
+        else if (list.length === 1) countEl.textContent = t('plaque.countOne') || '1 Founding Supporter';
+        else countEl.textContent = (t('plaque.countMany') || '{n} Founding Supporters').replace('{n}', list.length);
       }
     }
 
-    fetch('./wall-data.json', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
-      .then(render)
-      .catch(function () {
-        grid.textContent = '';
-        var note = document.getElementById('wallNote');
-        if (note) note.textContent = 'The wall is being polished — check back in a minute.';
-        grid.appendChild(openSlot(1));
-      });
+    if (grid) {
+      fetch('./wall-data.json', { cache: 'no-cache' })
+        .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+        .then(render)
+        .catch(function () {
+          lastData = [];
+          if (grid) grid.textContent = '';
+          var note = document.getElementById('wallNote');
+          if (note) note.textContent = t('plaque.polishing') || 'The wall is being polished — check back in a minute.';
+          if (grid) grid.appendChild(openSlot(1));
+        });
+    }
+
+    return render;
   })();
 
   // ── Anonymous analytics (PostHog) — same posture as the landing page ──────

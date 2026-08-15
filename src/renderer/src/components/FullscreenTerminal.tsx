@@ -19,6 +19,7 @@ import { useTerminalFontSize } from './terminalFontSize';
 import { useHasTerminalDraft } from './terminalPool';
 import { useAppTheme, toggleAppTheme } from '@/design/theme';
 import type { HarnessConfig } from '@/store/config';
+import { useT } from '@/i18n';
 
 /** Roster rail width. A fixed 232px is right on a 14" laptop but reads as a
  *  sliver on a 27" display, where names truncate for no reason — so it tracks
@@ -158,6 +159,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
   // overlay, so the roster carries restore too.
   const { restoring, autoRestoring, restoreTeam } = useRestoreTeam(config);
   const appThemeNow = useAppTheme();
+  const t = useT();
 
   const agent = agents.find(a => a.id === fullscreenAgentId);
   const parser = usePtyParser(agent?.id ?? '__none__');
@@ -274,7 +276,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
         <span style={{
           fontFamily: 'var(--cth-font-display)', fontSize: 12, lineHeight: '20px',
           color: 'var(--cth-ink-900)'
-        }}>MUNDER DIFFLIN · FULLSCREEN</span>
+        }}>{t('fullscreenTerminal.titlebar', 'MUNDER DIFFLIN · FULLSCREEN')}</span>
         {/* Same top-right controls as the main title bar — fullscreen covers
             it, so theme / exit-fullscreen / IDE must live here too. */}
         <div className="cth-titlebar-nodrag" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -283,8 +285,8 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
               const next = toggleAppTheme();
               void window.cth.updateConfig({ terminalTheme: next });
             }}
-            title={appThemeNow === 'dark' ? 'Switch to the light theme' : 'Switch to the dark theme'}
-            aria-label="Toggle dark mode"
+            title={appThemeNow === 'dark' ? t('fullscreenTerminal.toLightTheme', 'Switch to the light theme') : t('fullscreenTerminal.toDarkTheme', 'Switch to the dark theme')}
+            aria-label={t('fullscreenTerminal.toggleDarkMode', 'Toggle dark mode')}
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 28, height: 28, padding: 0,
@@ -298,8 +300,8 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
           </button>
           <button
             onClick={toggleRoster}
-            title={rosterCollapsed ? 'Show the agent list' : 'Hide the agent list — full-width terminal'}
-            aria-label={rosterCollapsed ? 'Show the agent list' : 'Hide the agent list'}
+            title={rosterCollapsed ? t('fullscreenTerminal.showAgentList', 'Show the agent list') : t('fullscreenTerminal.hideAgentListWide', 'Hide the agent list — full-width terminal')}
+            aria-label={rosterCollapsed ? t('fullscreenTerminal.showAgentList', 'Show the agent list') : t('fullscreenTerminal.hideAgentList', 'Hide the agent list')}
             aria-pressed={rosterCollapsed}
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -316,8 +318,8 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
           </button>
           <button
             onClick={() => setFullscreen(null)}
-            title="Exit fullscreen (Esc)"
-            aria-label="Exit fullscreen"
+            title={t('fullscreenTerminal.exitFullscreen', 'Exit fullscreen (Esc)')}
+            aria-label={t('fullscreenTerminal.exitFullscreenAria', 'Exit fullscreen')}
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 28, height: 28, padding: 0,
@@ -353,7 +355,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
           <div style={{ padding: 8, borderBottom: '1px solid var(--cth-ink-300)' }}>
             <button
               onClick={() => setAddAgentOpen(true)}
-              title="Add agent"
+              title={t('fullscreenTerminal.addAgent', 'Add agent')}
               style={{
                 width: '100%', height: 32,
                 background: 'var(--cth-cream-100)',
@@ -366,7 +368,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
                 cursor: 'pointer'
               }}
             >
-              <Icon name="plus" /> agent
+              <Icon name="plus" /> {t('fullscreenTerminal.agent', 'agent')}
             </button>
           </div>
 
@@ -442,7 +444,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
                   background: 'var(--cth-status-working)',
                   boxShadow: 'inset 0 0 0 1px var(--cth-ink-300)'
                 }}>
-                  <Icon name="play" /> restoring your team…
+                  <Icon name="play" /> {t('fullscreenTerminal.restoringTeam', 'restoring your team…')}
                 </div>
               )}
               {!autoRestoring && restorableAgents.length > 0 && (
@@ -452,10 +454,12 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
                   onClick={restoreTeam}
                   disabled={restoring}
                   style={{ width: '100%' }}
-                  title={`Respawn from last session: ${restorableAgents.map((a: Agent) => a.name).join(', ')} — same ids, memory and inboxes reattach automatically`}
+                  title={t('fullscreenTerminal.respawnTitle', 'Respawn from last session: {names} — same ids, memory and inboxes reattach automatically', { names: restorableAgents.map((a: Agent) => a.name).join(', ') })}
                 >
                   <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                    <Icon name="play" /> {restoring ? 'restoring…' : `restore team (${restorableAgents.length})`}
+                    <Icon name="play" /> {restoring
+                      ? t('fullscreenTerminal.restoring', 'restoring…')
+                      : t('fullscreenTerminal.restoreTeamCount', 'restore team ({n})', { n: restorableAgents.length })}
                   </span>
                 </PixelButton>
               )}
@@ -464,7 +468,7 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
                   {restorableAgents.map((a: Agent) => (
                     <span
                       key={a.id}
-                      title={`${a.name} — restorable from last session`}
+                      title={t('fullscreenTerminal.restorableFromLastSession', '{name} — restorable from last session', { name: a.name })}
                       style={{
                         display: 'inline-flex', alignItems: 'center', gap: 2,
                         height: 20, padding: '0 2px 0 6px',
@@ -476,8 +480,8 @@ export function FullscreenTerminal({ config }: FullscreenTerminalProps) {
                       {a.name}
                       <button
                         onClick={() => useStore.getState().removeRestorableAgent(a.id)}
-                        title={`Dismiss ${a.name} — remove permanently from the restore list`}
-                        aria-label={`Dismiss ${a.name}`}
+                        title={t('fullscreenTerminal.dismissRestorable', 'Dismiss {name} — remove permanently from the restore list', { name: a.name })}
+                        aria-label={t('fullscreenTerminal.dismissAria', 'Dismiss {name}', { name: a.name })}
                         style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                           width: 14, height: 14, padding: 0, lineHeight: 1,
@@ -559,6 +563,7 @@ function SidebarRow({
   drag: RowDrag;
   scale: ReturnType<typeof rosterScale>;
 }) {
+  const t = useT();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const noteRef = useRef<HTMLDivElement>(null);
   const [notePosition, setNotePosition] = useState<{ left: number; top: number } | null>(null);
@@ -669,8 +674,8 @@ function SidebarRow({
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); toggleEditor(); }
               }}
-              title={agent.note ? 'Edit private note' : 'Add private note'}
-              aria-label={`Edit note for ${agent.name}`}
+              title={agent.note ? t('fullscreenTerminal.editPrivateNote', 'Edit private note') : t('fullscreenTerminal.addPrivateNote', 'Add private note')}
+              aria-label={t('fullscreenTerminal.editNoteFor', 'Edit note for {name}', { name: agent.name })}
               style={{
                 flexShrink: 0, width: 20, height: 20,
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -707,7 +712,7 @@ function SidebarRow({
               <span style={{
                 fontSize: scale.note, lineHeight: 1.35,
                 color: 'var(--cth-ink-300)', fontStyle: 'italic'
-              }}>no note</span>
+              }}>{t('fullscreenTerminal.noNote', 'no note')}</span>
             )}
           </div>
         </div>
@@ -740,7 +745,7 @@ function SidebarRow({
             fontSize: noteLabelSize,
             lineHeight: `${Math.round(noteLabelSize * 1.5)}px`,
             color: 'var(--cth-ink-700)'
-          }}>PRIVATE NOTE</div>
+          }}>{t('fullscreenTerminal.privateNote', 'PRIVATE NOTE')}</div>
           {/* A textarea, not an input: the note is a bullet list, so Enter has
               to make a new line rather than doing nothing. autoFocus is safe
               now that opening is an explicit click, not a pointer fly-by. */}
@@ -755,8 +760,8 @@ function SidebarRow({
                 buttonRef.current?.focus();
               }
             }}
-            placeholder="one line per bullet…"
-            aria-label={`Note for ${agent.name}`}
+            placeholder={t('fullscreenTerminal.notePlaceholder', 'one line per bullet…')}
+            aria-label={t('fullscreenTerminal.noteFor', 'Note for {name}', { name: agent.name })}
             style={{
               width: '100%',
               height: noteHeight,
@@ -775,7 +780,7 @@ function SidebarRow({
           />
           <div style={{
             marginTop: 5, fontSize: 10, color: 'var(--cth-ink-500)'
-          }}>one line = one bullet · esc to close</div>
+          }}>{t('fullscreenTerminal.noteHint', 'one line = one bullet · esc to close')}</div>
         </div>
         </>,
         document.body
@@ -786,6 +791,7 @@ function SidebarRow({
 
 function Header({ agent }: { agent: Agent }) {
   const typing = useHasTerminalDraft(agent.ptyId);
+  const t = useT();
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
@@ -810,7 +816,7 @@ function Header({ agent }: { agent: Agent }) {
         {/* v0.3.4: the IDE opens from agent level — full Monaco editor + git
             diff over this agent's workspace. */}
         <PixelButton variant="secondary" size="sm" onClick={() => useStore.getState().setIdeOpen(true)}>
-          <span title="Open the IDE — file editor + git diff" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span title={t('fullscreenTerminal.openIde', 'Open the IDE — file editor + git diff')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Icon name="code" /> IDE
           </span>
         </PixelButton>

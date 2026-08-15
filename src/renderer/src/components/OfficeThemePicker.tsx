@@ -6,6 +6,7 @@ import { PixelPanel } from './PixelPanel';
 import { PixelButton } from './PixelButton';
 import { Icon } from './Icon';
 import type { ThemeId } from '@/scene/office/themeRegistry';
+import { useT } from '@/i18n';
 
 // TV-show office themes (Phase 1 = the switch flow infra). Only `office` has a
 // real map+cast today; the five shows render via the loader's office fallback
@@ -59,6 +60,8 @@ export function OfficeThemePicker({ config }: { config: HarnessConfig }) {
     setPending(id);                                     // workers exist → confirm modal
   };
 
+  const t = useT();
+
   const applyTheme = async (id: ThemeId) => {
     setBusy(true);
     try {
@@ -77,17 +80,21 @@ export function OfficeThemePicker({ config }: { config: HarnessConfig }) {
       await window.cth.updateConfig({ officeTheme: id });
       setCurrent(id);
       setOfficeTheme(id); // → OfficeFloor rebuilds the scene on the new map/cast
-      const meta = THEME_META.find((t) => t.id === id);
-      if (meta && !meta.built) setNote(`${meta.label} isn't built yet — showing the office for now.`);
+      const meta = THEME_META.find((m) => m.id === id);
+      if (meta && !meta.built) {
+        setNote(t('officeThemePicker.notBuiltYet', "{label} isn't built yet — showing the office for now.", { label: meta.label }));
+      }
     } catch (e) {
-      setNote(`Switch aborted — a terminal wouldn't close: ${e instanceof Error ? e.message : String(e)}`);
+      setNote(t('officeThemePicker.switchAborted', "Switch aborted — a terminal wouldn't close: {error}", {
+        error: e instanceof Error ? e.message : String(e)
+      }));
     } finally {
       setBusy(false);
       setPending(null);
     }
   };
 
-  const pendingMeta = pending ? THEME_META.find((t) => t.id === pending) : null;
+  const pendingMeta = pending ? THEME_META.find((m) => m.id === pending) : null;
 
   return (
     <div>
@@ -95,33 +102,33 @@ export function OfficeThemePicker({ config }: { config: HarnessConfig }) {
         fontFamily: 'var(--cth-font-display)', fontSize: 8, lineHeight: '12px',
         color: 'var(--cth-ink-500)', textTransform: 'uppercase', marginBottom: 10
       }}>
-        Office Theme
+        {t('officeThemePicker.title', 'Office Theme')}
       </div>
 
       {/* Experimental feature flag */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <span style={{ fontSize: 13, lineHeight: '20px', color: 'var(--cth-ink-900)' }}>
-            TV-show office themes <span style={{ color: 'var(--cth-ink-500)' }}>(experimental)</span>
+            {t('officeThemePicker.flagLabel', 'TV-show office themes')} <span style={{ color: 'var(--cth-ink-500)' }}>({t('officeThemePicker.experimental', 'experimental')})</span>
           </span>
           <span style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-500)' }}>
-            Re-skin the pixel office as a TV show. Switching starts a fresh cast.
+            {t('officeThemePicker.flagBlurb', 'Re-skin the pixel office as a TV show. Switching starts a fresh cast.')}
           </span>
         </div>
         <PixelButton variant={enabled ? 'primary' : 'secondary'} size="sm" onClick={toggleFlag}>
-          {enabled ? 'on' : 'off'}
+          {enabled ? t('common.on', 'on') : t('common.off', 'off')}
         </PixelButton>
       </div>
 
       {/* Theme picker grid (only when the flag is on) */}
       {enabled && (
         <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
-          {THEME_META.map((t) => {
-            const isCurrent = t.id === current;
+          {THEME_META.map((theme) => {
+            const isCurrent = theme.id === current;
             return (
               <button
-                key={t.id}
-                onClick={() => onSelect(t.id)}
+                key={theme.id}
+                onClick={() => onSelect(theme.id)}
                 disabled={busy}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left',
@@ -134,27 +141,28 @@ export function OfficeThemePicker({ config }: { config: HarnessConfig }) {
                 }}
               >
                 <span style={{
-                  width: 28, height: 28, flexShrink: 0, background: t.swatch,
+                  width: 28, height: 28, flexShrink: 0, background: theme.swatch,
                   boxShadow: 'inset 0 0 0 1.5px var(--cth-ink-500)',
                 }} />
                 <span style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {/* theme.label is a real TV show title (trademarked) — never translated */}
                     <span style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {t.label}
+                      {theme.label}
                     </span>
                     {isCurrent && (
                       <span style={{ fontFamily: 'var(--cth-font-display)', fontSize: 7, color: 'var(--cth-mint)', textTransform: 'uppercase' }}>
-                        current
+                        {t('common.current', 'current')}
                       </span>
                     )}
-                    {!t.built && !isCurrent && (
+                    {!theme.built && !isCurrent && (
                       <span style={{ fontFamily: 'var(--cth-font-display)', fontSize: 7, color: 'var(--cth-ink-500)', textTransform: 'uppercase' }}>
-                        soon
+                        {t('common.soon', 'soon')}
                       </span>
                     )}
                   </span>
                   <span style={{ fontSize: 11, lineHeight: '14px', color: 'var(--cth-ink-500)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t.blurb}
+                    {t(`officeThemePicker.blurb.${theme.id}`, theme.blurb)}
                   </span>
                 </span>
               </button>
@@ -192,9 +200,10 @@ function ThemeSwitchConfirmModal({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const t = useT();
   const n = agents.length;
   const working = agents.filter((a) => a.status && !['idle', 'success', 'error'].includes(a.status)).length;
-  const godName = useStore.getState().agents.find((a) => a.isGod)?.name ?? 'the orchestrator';
+  const godName = useStore.getState().agents.find((a) => a.isGod)?.name ?? t('common.theOrchestrator', 'the orchestrator');
 
   return (
     <div
@@ -205,7 +214,7 @@ function ThemeSwitchConfirmModal({
       }}
     >
       <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '92vw' }}>
-        <PixelPanel variant="dialog" title={`SWITCH OFFICE TO "${label.toUpperCase()}"?`} noPadding>
+        <PixelPanel variant="dialog" title={t('officeThemePicker.confirm.pageTitle', 'SWITCH OFFICE TO "{label}"?', { label: label.toUpperCase() })} noPadding>
           <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{
@@ -221,28 +230,36 @@ function ThemeSwitchConfirmModal({
                   fontFamily: 'var(--cth-font-display)', fontSize: 12, lineHeight: '20px',
                   color: 'var(--cth-ink-900)', marginBottom: 4,
                 }}>
-                  STARTS A FRESH CAST
+                  {t('officeThemePicker.confirm.freshCast', 'STARTS A FRESH CAST')}
                 </div>
                 <div style={{ fontSize: 15, lineHeight: '22px', color: 'var(--cth-ink-700)' }}>
-                  Your <strong>{n} current agent{n === 1 ? '' : 's'}</strong> will be deleted — their terminals close and any in-progress work stops. Only <strong>{godName}</strong> carries over.
+                  {n === 1 ? (
+                    <>{t('officeThemePicker.confirm.body1.one', 'Your')} <strong>{t('officeThemePicker.confirm.oneAgent', '{n} current agent', { n })}</strong> {t('officeThemePicker.confirm.body2.one', 'will be deleted — their terminals close and any in-progress work stops. Only')} <strong>{godName}</strong> {t('officeThemePicker.confirm.body3', 'carries over.')}</>
+                  ) : (
+                    <>{t('officeThemePicker.confirm.body1.many', 'Your')} <strong>{t('officeThemePicker.confirm.manyAgents', '{n} current agents', { n })}</strong> {t('officeThemePicker.confirm.body2.many', 'will be deleted — their terminals close and any in-progress work stops. Only')} <strong>{godName}</strong> {t('officeThemePicker.confirm.body3', 'carries over.')}</>
+                  )}
                   {working > 0 && (
                     <span style={{ display: 'block', marginTop: 6, color: 'var(--cth-coral)' }}>
-                      ⚠ {working} agent{working === 1 ? ' is' : 's are'} still working.
+                      {working === 1
+                        ? t('officeThemePicker.confirm.oneWorking', '⚠ {n} agent is still working.', { n: working })
+                        : t('officeThemePicker.confirm.manyWorking', '⚠ {n} agents are still working.', { n: working })}
                     </span>
                   )}
                 </div>
                 <div style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-500)', marginTop: 8 }}>
-                  This can't be undone.
+                  {t('officeThemePicker.confirm.irreversible', "This can't be undone.")}
                 </div>
               </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <PixelButton variant="secondary" size="md" onClick={onCancel} disabled={busy}>
-                cancel
+                {t('common.cancel', 'cancel')}
               </PixelButton>
               <PixelButton variant="destructive" size="md" onClick={onConfirm} disabled={busy}>
-                {busy ? 'switching…' : `delete ${n} & switch`}
+                {busy
+                  ? t('officeThemePicker.confirm.switching', 'switching…')
+                  : t('officeThemePicker.confirm.deleteAndSwitch', 'delete {n} & switch', { n })}
               </PixelButton>
             </div>
           </div>

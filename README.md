@@ -1,5 +1,7 @@
 <div align="center">
 
+🇫🇷 [Lire en français](./README.fr.md)
+
 <img src="./docs/logo.png" alt="Munder Difflin Inc — Multi-Agent Harness" width="340">
 
 # Munder Difflin

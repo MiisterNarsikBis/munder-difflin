@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PixelPanel } from './PixelPanel';
 import { PixelButton } from './PixelButton';
 import { Icon } from './Icon';
+import { useT } from '@/i18n';
 
 /** Renderer-side closing-time view state. Mirrors the main process's
  *  ClosingTimeEvent phases, plus a local 'error' for a failed start. */
@@ -24,6 +25,7 @@ export interface QuitWarningModalProps {
 }
 
 export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClosingTime }: QuitWarningModalProps) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
 
   const confirm = async () => {
@@ -48,7 +50,7 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
         onClick={(e) => e.stopPropagation()}
         style={{ width: 480, maxWidth: '92vw' }}
       >
-        <PixelPanel variant="dialog" title={inClosingTime ? 'CLOSING TIME' : 'QUITTING NOW?'} noPadding>
+        <PixelPanel variant="dialog" title={inClosingTime ? t('quitWarningModal.closingTimeTitle', 'CLOSING TIME') : t('quitWarningModal.quittingNowTitle', 'QUITTING NOW?')} noPadding>
           <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
             {inClosingTime ? (
               <>
@@ -71,19 +73,16 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                       marginBottom: 4
                     }}>
                       {closing!.phase === 'complete'
-                        ? 'FLOOR SAVED — SEE YOU TOMORROW'
+                        ? t('quitWarningModal.floorSaved', 'FLOOR SAVED — SEE YOU TOMORROW')
                         : closing!.phase === 'timeout'
-                          ? 'STILL WRAPPING UP…'
-                          : 'WRAPPING UP THE FLOOR'}
+                          ? t('quitWarningModal.stillWrappingUp', 'STILL WRAPPING UP…')
+                          : t('quitWarningModal.wrappingUpFloor', 'WRAPPING UP THE FLOOR')}
                     </div>
                     <div style={{ fontSize: 15, lineHeight: '22px', color: 'var(--cth-ink-700)' }}>
                       {closing!.phase === 'complete' ? (
-                        <>Every agent saved its memory and the orchestrator confirmed the
-                        shutdown. The harness closes itself in a moment.</>
+                        <>{t('quitWarningModal.completeBody', 'Every agent saved its memory and the orchestrator confirmed the shutdown. The harness closes itself in a moment.')}</>
                       ) : (
-                        <>The orchestrator broadcast closing time. Every worker parks its
-                        work, saves its memory, and reports back — the app closes only
-                        after the orchestrator confirms nothing will be lost.</>
+                        <>{t('quitWarningModal.progressBody', 'The orchestrator broadcast closing time. Every worker parks its work, saves its memory, and reports back — the app closes only after the orchestrator confirms nothing will be lost.')}</>
                       )}
                     </div>
                   </div>
@@ -99,12 +98,11 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                   fontFamily: 'var(--cth-font-display)'
                 }}>
                   {closing!.total > 0
-                    ? `${closing!.acked} / ${closing!.total} WORKERS CONFIRMED${closing!.acked >= closing!.total ? ' — WAITING FOR THE ORCHESTRATOR' : ''}`
-                    : 'NO WORKERS ON THE FLOOR — WAITING FOR THE ORCHESTRATOR'}
+                    ? `${t('quitWarningModal.ackProgress', '{acked} / {total} WORKERS CONFIRMED', { acked: closing!.acked, total: closing!.total })}${closing!.acked >= closing!.total ? t('quitWarningModal.waitingForOrchestratorSuffix', ' — WAITING FOR THE ORCHESTRATOR') : ''}`
+                    : t('quitWarningModal.noWorkers', 'NO WORKERS ON THE FLOOR — WAITING FOR THE ORCHESTRATOR')}
                   {closing!.phase === 'timeout' && (
                     <div style={{ marginTop: 6, fontFamily: 'var(--cth-font-body, inherit)' }}>
-                      This is taking a while (an agent may be mid-compaction or deep in a
-                      tool call). Keep waiting, or force quit and accept the data loss.
+                      {t('quitWarningModal.takingAWhile', 'This is taking a while (an agent may be mid-compaction or deep in a tool call). Keep waiting, or force quit and accept the data loss.')}
                     </div>
                   )}
                 </div>
@@ -113,10 +111,10 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                   {closing!.phase !== 'complete' && (
                     <>
                       <PixelButton variant="secondary" size="md" onClick={onCancel} disabled={busy}>
-                        cancel — back to work
+                        {t('quitWarningModal.cancelBackToWork', 'cancel — back to work')}
                       </PixelButton>
                       <PixelButton variant="destructive" size="md" onClick={confirm} disabled={busy}>
-                        {busy ? 'killing...' : 'force quit now'}
+                        {busy ? t('quitWarningModal.killing', 'killing...') : t('quitWarningModal.forceQuitNow', 'force quit now')}
                       </PixelButton>
                     </>
                   )}
@@ -142,13 +140,14 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                       color: 'var(--cth-ink-900)',
                       marginBottom: 4
                     }}>
-                      {ptyCount} {ptyCount === 1 ? 'AGENT' : 'AGENTS'} STILL RUNNING
+                      {ptyCount === 1
+                        ? t('quitWarningModal.stillRunning.one', '{n} AGENT STILL RUNNING', { n: ptyCount })
+                        : t('quitWarningModal.stillRunning.many', '{n} AGENTS STILL RUNNING', { n: ptyCount })}
                     </div>
                     <div style={{ fontSize: 15, lineHeight: '22px', color: 'var(--cth-ink-700)' }}>
-                      Closing the harness will terminate{' '}
-                      {ptyCount === 1 ? 'the running claude session' : `all ${ptyCount} running claude sessions`}{' '}
-                      and discard any unsaved progress they were holding in memory. The conversation
-                      history inside each session is lost when the PTY exits.
+                      {ptyCount === 1
+                        ? t('quitWarningModal.terminateWarning.one', 'Closing the harness will terminate the running claude session and discard any unsaved progress they were holding in memory. The conversation history inside each session is lost when the PTY exits.')
+                        : t('quitWarningModal.terminateWarning.many', 'Closing the harness will terminate all {n} running claude sessions and discard any unsaved progress they were holding in memory. The conversation history inside each session is lost when the PTY exits.', { n: ptyCount })}
                     </div>
                   </div>
                 </div>
@@ -160,9 +159,7 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                   fontSize: 12, lineHeight: '18px',
                   color: 'var(--cth-ink-700)'
                 }}>
-                  Tip: <strong>closing time</strong> is the safe way out — the orchestrator has
-                  every agent commit its work and save its memory, and the app closes itself
-                  once the whole floor has confirmed. No data loss.
+                  {t('quitWarningModal.tipPrefix', 'Tip:')} <strong>{t('quitWarningModal.tipClosingTime', 'closing time')}</strong> {t('quitWarningModal.tipRest', 'is the safe way out — the orchestrator has every agent commit its work and save its memory, and the app closes itself once the whole floor has confirmed. No data loss.')}
                 </div>
 
                 {closing?.phase === 'error' && (
@@ -173,23 +170,27 @@ export function QuitWarningModal({ ptyCount, closing, onCancel, onConfirm, onClo
                     fontSize: 12, lineHeight: '18px',
                     color: 'var(--cth-ink-900)'
                   }}>
-                    {closing.error ?? 'Closing time could not start.'}
+                    {closing.error ?? t('quitWarningModal.closingTimeCouldNotStart', 'Closing time could not start.')}
                   </div>
                 )}
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap' }}>
                   <PixelButton variant="secondary" size="md" onClick={onCancel} disabled={busy}>
-                    keep them running
+                    {t('quitWarningModal.keepThemRunning', 'keep them running')}
                   </PixelButton>
                   {onClosingTime && (
                     <PixelButton variant="primary" size="md" onClick={onClosingTime} disabled={busy}>
                       <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                        <Icon name="clock" /> closing time
+                        <Icon name="clock" /> {t('quitWarningModal.closingTimeButton', 'closing time')}
                       </span>
                     </PixelButton>
                   )}
                   <PixelButton variant="destructive" size="md" onClick={confirm} disabled={busy}>
-                    {busy ? 'killing...' : `kill ${ptyCount === 1 ? 'it' : 'all'} & quit`}
+                    {busy
+                      ? t('quitWarningModal.killing', 'killing...')
+                      : ptyCount === 1
+                        ? t('quitWarningModal.killItAndQuit', 'kill it & quit')
+                        : t('quitWarningModal.killAllAndQuit', 'kill all & quit')}
                   </PixelButton>
                 </div>
               </>
