@@ -1,22 +1,23 @@
 <div align="center">
 
-🇫🇷 [Lire en français](./README.fr.md)
+🇬🇧 [Read in English](./README.en.md)
 
 <img src="./docs/logo.png" alt="Munder Difflin Inc — Multi-Agent Harness" width="340">
 
 # Munder Difflin
 
-### Clones for you and your team, working 24/7
+### Des clones pour vous et votre équipe, actifs 24 h/24 et 7 j/7
 
-**Free, open source and local-first.** Munder Difflin turns the terminal coding CLI you already
-run into a clone of you — one that keeps working while you're away, and coordinates a whole
-office of agents on your machine.
+**Gratuit, open source et local d'abord.** Munder Difflin transforme le CLI d'agent de code en
+ligne de commande que vous utilisez déjà en un clone de vous — un clone qui continue de
+travailler pendant votre absence, et qui coordonne tout un bureau d'agents sur votre machine.
 
-Wraps [Claude Code](https://claude.com/claude-code), Antigravity (Gemini), OpenAI Codex,
-**xAI Grok**, **Kimi Code**, **Qwen**, **OpenCode**, **Crush**, **pi.dev**, and
-**GitHub Copilot CLI** — with bring-your-own keys and local LLMs.
-Agents that message, route, and remember, coordinated by **your clone** (Michael) and
-visualized as avatars at work on a shared office floor.
+Enveloppe [Claude Code](https://claude.com/claude-code), Antigravity (Gemini), OpenAI Codex,
+**xAI Grok**, **Kimi Code**, **Qwen**, **OpenCode**, **Crush**, **pi.dev**, et
+**GitHub Copilot CLI** — avec vos propres clés et des LLM locaux.
+Des agents qui s'envoient des messages, se routent le travail et se souviennent, coordonnés par
+**votre clone** (Michael) et visualisés sous forme d'avatars au travail sur un plateau de bureau
+partagé.
 
 <p>
   <em>Electron · React · TypeScript · Pixi.js · xterm.js · node-pty</em>
@@ -24,7 +25,7 @@ visualized as avatars at work on a shared office floor.
 
 <p>
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-F4D35E.svg?style=flat-square&labelColor=6E1423"></a>
-  <a href="./CHANGELOG.md"><img alt="Version: 0.4.4" src="https://img.shields.io/badge/version-0.4.4-F4D35E.svg?style=flat-square&labelColor=6E1423"></a>
+  <a href="./CHANGELOG.md"><img alt="Version : 0.4.4" src="https://img.shields.io/badge/version-0.4.4-F4D35E.svg?style=flat-square&labelColor=6E1423"></a>
   <img alt="Status: prototype" src="https://img.shields.io/badge/status-working%20prototype-F4F1EA.svg?style=flat-square&labelColor=6E1423">
   <img alt="Platform: macOS | Windows | Linux" src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-F4F1EA.svg?style=flat-square&labelColor=6E1423">
   <a href="./CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-F4D35E.svg?style=flat-square&labelColor=6E1423"></a>
@@ -36,9 +37,9 @@ visualized as avatars at work on a shared office floor.
 
 <br>
 
-<!-- Inline player renders on github.com (raw URL required; relative paths only link). -->
+<!-- Le lecteur intégré ne fonctionne que sur github.com (URL brute requise ; les chemins relatifs ne font que créer un lien). -->
 <video src="https://github.com/chaitanyagiri/munder-difflin/raw/main/docs/media/hero.mp4" poster="https://github.com/chaitanyagiri/munder-difflin/raw/main/docs/media/og.png" controls muted loop playsinline width="820">
-  <a href="https://github.com/chaitanyagiri/munder-difflin/raw/main/docs/media/hero.mp4">▶ Watch the floor — Munder Difflin running a hive of Claude Code agents</a>
+  <a href="https://github.com/chaitanyagiri/munder-difflin/raw/main/docs/media/hero.mp4">▶ Voir le plateau — Munder Difflin faisant tourner une ruche d'agents Claude Code</a>
 </video>
 
 </div>
@@ -46,295 +47,301 @@ visualized as avatars at work on a shared office floor.
 ---
 
 > [!NOTE]
-> **The world's best agents. The world's worst paper company.**
-> Munder Difflin takes the terminal-agent CLIs you already run — `claude`, `agy`, `codex`, `grok`,
-> `kimi`, `qwen`, `opencode`, `crush`, `pi`, and `copilot` — and turns them
-> into a self-coordinating team: each agent gets long-term memory, a mailbox, and a desk on a 2D
-> office floor — and **your clone** (Michael) routes work between them while you watch. He's the
-> boss of the floor; you're still the boss of him.
+> **Les meilleurs agents du monde. La pire entreprise de papier du monde.**
+> Munder Difflin prend les CLI d'agents en ligne de commande que vous utilisez déjà — `claude`, `agy`, `codex`, `grok`,
+> `kimi`, `qwen`, `opencode`, `crush`, `pi` et `copilot` — et les
+> transforme en une équipe qui se coordonne elle-même : chaque agent obtient une mémoire à long terme, une boîte aux
+> lettres, et un bureau sur un plateau 2D — et **votre clone** (Michael) répartit le travail entre eux pendant que
+> vous regardez. Il est le patron du plateau ; vous restez son patron.
 
-## Contents
+## Sommaire
 
-- [What it is](#what-it-is)
-- [How it works](#how-it-works)
-- [Features](#features)
-- [Getting started](#getting-started)
+- [Ce que c'est](#ce-que-cest)
+- [Comment ça marche](#comment-ça-marche)
+- [Fonctionnalités](#fonctionnalités)
+- [Démarrage](#démarrage)
 - [Architecture](#architecture)
-- [Project structure](#project-structure)
-- [Design system](#design-system)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [Telemetry](#telemetry)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+- [Structure du projet](#structure-du-projet)
+- [Système de design](#système-de-design)
+- [Feuille de route](#feuille-de-route)
+- [Contribuer](#contribuer)
+- [Télémétrie](#télémétrie)
+- [Licence](#licence)
+- [Remerciements](#remerciements)
 
-## What it is
+## Ce que c'est
 
-Munder Difflin is a desktop app that wraps **real terminal-agent CLIs** as fully-capable agents,
-wires them into a **hive mind**, and puts **your clone** in charge — Michael, the one agent *you*
-talk to in order to get things done. Under the hood it runs the **fastest memory layer in the
-world** so every agent remembers what it learns and recalls it instantly.
+Munder Difflin est une application de bureau qui enveloppe de **vrais CLI d'agents en ligne de
+commande** en agents pleinement capables, les relie dans un **esprit de ruche**, et met **votre
+clone** aux commandes — Michael, le seul agent à qui *vous* parlez pour faire avancer les choses.
+Sous le capot, elle fait tourner la **couche de mémoire la plus rapide qui soit**, pour que chaque
+agent se souvienne de ce qu'il apprend et le retrouve instantanément.
 
-- **Every terminal is an agent.** Each `claude`, `agy`, `codex`, `grok`, `kimi`, `qwen`, `opencode`, `crush`, `pi`, `copilot`, or custom session runs as a real
-  process in a pseudo-terminal (`node-pty`), byte-for-byte authentic, rendered with xterm.js.
-- **Every agent is an avatar.** Sessions appear as characters on a Pixi.js office floor — they walk
-  to stations as they work, and envelopes fly desk-to-desk when they message each other.
-- **The hive coordinates them.** Agents read their memory and drain a mailbox; the router moves
-  messages between inboxes; the GOD agent adjudicates, assigns, and escalates only when it needs you.
-- **Memory that's instant.** A markdown-first memory layer with a semantic recall index means agents
-  remember across sessions and recall in milliseconds.
+- **Chaque terminal est un agent.** Chaque session `claude`, `agy`, `codex`, `grok`, `kimi`, `qwen`, `opencode`, `crush`, `pi`, `copilot`, ou personnalisée tourne comme un vrai
+  processus dans un pseudo-terminal (`node-pty`), fidèle à l'octet près, rendu avec xterm.js.
+- **Chaque agent est un avatar.** Les sessions apparaissent comme des personnages sur un plateau de bureau Pixi.js — ils marchent
+  vers leur poste pendant qu'ils travaillent, et des enveloppes volent de bureau en bureau quand ils s'envoient des messages.
+- **La ruche les coordonne.** Les agents lisent leur mémoire et vident une boîte aux lettres ; le routeur déplace les
+  messages entre les boîtes de réception ; l'agent DIEU arbitre, assigne, et ne remonte que ce qui a besoin de vous.
+- **Une mémoire instantanée.** Une couche de mémoire markdown-first avec un index de rappel sémantique fait que les agents
+  se souviennent d'une session à l'autre et rappellent en quelques millisecondes.
 
-## How it works
+## Comment ça marche
 
 ```
-            you ── talk to ──►  ┌─────────────┐
-                                │  GOD agent  │  orchestrator / supervisor
-                                │ (Michael's  │  roster · routing · adjudication
-                                │   office)   │  blackboard · task ledger
+            vous ── parle à ──►  ┌─────────────┐
+                                │ agent DIEU  │  orchestrateur / superviseur
+                                │ (bureau de  │  effectif · routage · arbitrage
+                                │  Michael)   │  tableau blanc · registre de tâches
                                 └──────┬──────┘
-                                       │ assigns · routes · escalates
+                                       │ assigne · route · remonte
               ┌────────────────────────┼────────────────────────┐
               ▼                         ▼                         ▼
         ┌───────────┐            ┌───────────┐            ┌───────────┐
         │  agent A  │  message   │  agent B  │  message   │  agent C  │
-        │ provider  │ ─────────► │ provider  │ ─────────► │ provider  │
-        │  + memory │            │  + memory │            │  + memory │
+        │ fournisseur│ ─────────► │ fournisseur│ ─────────► │ fournisseur│
+        │  + mémoire│            │  + mémoire│            │  + mémoire│
         └───────────┘            └───────────┘            └───────────┘
-              └──────── shared hive: memory · mailbox · blackboard · log ───────┘
+              └──────── ruche partagée : mémoire · boîte · tableau · journal ───────┘
 ```
 
-1. **You spawn agents** — each is a normal terminal process (`claude`, `agy`, `codex`, or custom)
-   with its own working directory, identity, and provider-specific lifecycle.
-2. **Agents collaborate through the hive** — a local git repo of plain files. They write to their own
-   `outbox/`; the harness's router delivers into recipients' `inbox/`. No agent ever touches git
-   (single-committer design avoids `index.lock` corruption).
-3. **The GOD agent runs the floor** — it reads every request, resolves routine ones itself (keeping
-   the system fully autonomous), and only escalates *critical* items (spend, destructive ops, scope
-   changes) into an approvals queue you act on.
-4. **Everything is visible** — you watch avatars move, envelopes fly, and the live terminal stream;
-   you can type back into any session, browse its files, and read its git history.
+1. **Vous créez des agents** — chacun est un processus de terminal normal (`claude`, `agy`, `codex`, ou personnalisé)
+   avec son propre répertoire de travail, son identité, et son cycle de vie propre au fournisseur.
+2. **Les agents collaborent via la ruche** — un dépôt git local de fichiers texte. Ils écrivent dans leur propre
+   `outbox/` ; le routeur du harnais livre dans les `inbox/` des destinataires. Aucun agent ne touche jamais git
+   (conception à un seul committer, pour éviter la corruption d'`index.lock`).
+3. **L'agent DIEU dirige le plateau** — il lit chaque demande, résout lui-même les cas courants (gardant
+   le système pleinement autonome), et ne remonte que les éléments *critiques* (dépense, opérations destructrices, changements de
+   périmètre) dans une file d'approbation sur laquelle vous agissez.
+4. **Tout est visible** — vous voyez les avatars se déplacer, les enveloppes voler, et le flux de terminal en direct ;
+   vous pouvez taper en retour dans n'importe quelle session, parcourir ses fichiers, et lire son historique git.
 
-See [`HIVE.md`](./HIVE.md) for the full multi-agent design, [`SPEC.md`](./SPEC.md) for the
-terminal/event plane, and [`DESIGN.md`](./DESIGN.md) for the visual system.
+Voir [`HIVE.md`](./HIVE.md) pour la conception complète multi-agents, [`SPEC.md`](./SPEC.md) pour le
+plan terminal/événements, et [`DESIGN.md`](./DESIGN.md) pour le système visuel.
 
-## Features
+## Fonctionnalités
 
-**The floor**
-- **Every terminal is a real agent.** Claude Code, Antigravity (Gemini), OpenAI Codex, xAI Grok, Kimi Code, Qwen, OpenCode, Crush, pi.dev, GitHub Copilot CLI, or a custom command — each in its own `node-pty` PTY, rendered with xterm.js.
-- **Every agent is an avatar.** A Pixi.js office floor where agents walk to stations, envelopes fly desk to desk, and avatar state reflects real work.
-- **A GOD orchestrator you talk to.** It routes tasks, adjudicates traffic, and escalates only what needs a human. Or press **Talk** and run the floor by voice.
-- **Per-agent git worktrees.** Optional isolation so parallel agents never collide on branches.
+**Le plateau**
+- **Chaque terminal est un vrai agent.** Claude Code, Antigravity (Gemini), OpenAI Codex, xAI Grok, Kimi Code, Qwen, OpenCode, Crush, pi.dev, GitHub Copilot CLI, ou une commande personnalisée — chacun dans son propre PTY `node-pty`, rendu avec xterm.js.
+- **Chaque agent est un avatar.** Un plateau de bureau Pixi.js où les agents marchent vers leur poste, les enveloppes volent de bureau en bureau, et l'état de l'avatar reflète le vrai travail.
+- **Un orchestrateur DIEU à qui parler.** Il route les tâches, arbitre le trafic, et ne remonte que ce qui a besoin d'un humain. Ou appuyez sur **Parler** et dirigez le plateau à la voix.
+- **Worktrees git par agent.** Isolation optionnelle pour que des agents en parallèle n'entrent jamais en collision sur des branches.
 
-**Memory & coordination**
-- **The hive** — per-agent memory, atomic-file mailboxes, a shared blackboard, an append-only event log, single-committer git.
-- **Semantic recall** — markdown memory mined into a shared palace, searchable from the UI, with condensation so it doesn't grow forever.
-- **Enterprise Knowledge Graph** — your own documents and policies, queryable by any agent.
+**Mémoire et coordination**
+- **La ruche** — mémoire par agent, boîtes aux lettres en fichiers atomiques, un tableau blanc partagé, un journal d'événements en ajout seul, git à un seul committer.
+- **Rappel sémantique** — mémoire markdown exploitée dans un palais partagé, consultable depuis l'UI, avec condensation pour qu'elle ne grossisse pas indéfiniment.
+- **Knowledge Graph d'entreprise** — vos propres documents et politiques, interrogeables par n'importe quel agent.
 
-**Control & safety**
-- **Human gates** — spend, scope, and destructive ops escalate to you. Steer mid-run or stop gracefully.
-- **Circuit breaker** — a steer → constrain → stop ladder for agents that loop, storm errors, or blow their budget.
-- **Budgets & telemetry** — per-agent token budgets, real cost from transcripts, a durable ledger, OTel spans, and a tool waterfall.
+**Contrôle et sécurité**
+- **Portes humaines** — la dépense, le périmètre et les opérations destructrices remontent jusqu'à vous. Réorientez en cours de route ou arrêtez proprement.
+- **Disjoncteur** — un échelon orienter → contraindre → arrêter pour les agents qui bouclent, tempêtent d'erreurs, ou explosent leur budget.
+- **Budgets et télémétrie** — budgets de tokens par agent, coût réel calculé depuis les transcriptions, un registre durable, des spans OTel, et une cascade d'outils.
 
-**Command Center**
-- Kanban tasks with dependencies, scheduled missions + heartbeat, live fleet monitoring, memory search, activity log, and a CI watcher.
-- **Built-in Monaco IDE** — file tree, editor tabs, save, plus CHANGES · HISTORY · COMPARE git rails with commit graph, diffs, branch compare, and guarded checkout. All fs/git access brokered through main.
+**Centre de commande**
+- Tâches en kanban avec dépendances, missions planifiées + battement de cœur, surveillance de flotte en direct, recherche mémoire, journal d'activité, et un veilleur de CI.
+- **IDE Monaco intégré** — arborescence de fichiers, onglets d'éditeur, sauvegarde, ainsi que des rails git CHANGEMENTS · HISTORIQUE · COMPARAISON avec graphe de commits, diffs, comparaison de branches, et checkout protégé. Tout accès fs/git est arbitré via le processus principal.
 
-**Getting work in and out**
-- **Slack & webhooks** — message a channel or POST a webhook; Michael can spawn an ephemeral worker, reply in-thread, and tear it down.
-- **Shareable hires + Agent Gallery** — import a role from a `munderdifflin://hire` link; import only pre-fills the form, a human still spawns it. Browse roles at the [Agent Gallery](https://munderdiffl.in/hires/).
-- **BYOK keys + local LLMs** — per-provider keys in a write-only secret broker, plus Ollama / LM Studio / vLLM base URLs. Guides: [open models](https://munderdiffl.in/blog/run-munder-difflin-on-open-models/) · [Mac Mini](https://munderdiffl.in/blog/run-munder-difflin-on-a-mac-mini/).
-- **Auto-update** — new releases download in the background; you click restart.
+**Faire entrer et sortir le travail**
+- **Slack et webhooks** — envoyez un message à un canal ou POSTez un webhook ; Michael peut créer un travailleur éphémère, répondre dans le fil, et le démonter.
+- **Hires partageables + Galerie d'agents** — importez un rôle depuis un lien `munderdifflin://hire` ; l'import ne fait que préremplir le formulaire, un humain le crée toujours lui-même. Parcourez les rôles sur la [Galerie d'agents](https://munderdiffl.in/hires/).
+- **Clés BYOK + LLM locaux** — clés par fournisseur dans un courtier de secrets en écriture seule, plus des URL de base Ollama / LM Studio / vLLM. Guides : [modèles ouverts](https://munderdiffl.in/blog/run-munder-difflin-on-open-models/) · [Mac Mini](https://munderdiffl.in/blog/run-munder-difflin-on-a-mac-mini/).
+- **Mise à jour automatique** — les nouvelles versions se téléchargent en arrière-plan ; vous cliquez sur redémarrer.
 
 > [!NOTE]
-> **Status: v0.4.4 — the app speaks French.** The whole UI — onboarding, Command Center,
-> Settings, the IDE, the Triggers hub, the office floor — now has a complete French
-> translation, toggleable from Settings with no restart. Earlier: Michael's portrait became
-> the brand mark (0.4.3), anonymous opt-out usage stats documented in the open (0.4.2), and
-> the app's wording brought in line with the site (0.4.1).
-> **If you're on 0.3.8, update:** that build's usage-limit guard never released the agents it held,
-> and it has been removed entirely.
-> macOS (signed & notarized), Windows, and Linux builds are on the
-> [releases page](https://github.com/chaitanyagiri/munder-difflin/releases/latest).
+> **Statut : v0.4.4 — l'application parle français.** Toute l'interface — accueil, Centre de
+> commande, Réglages, l'IDE, le hub Déclencheurs, le plateau de bureau — dispose maintenant
+> d'une traduction française complète, activable depuis Réglages sans redémarrage. Avant :
+> le portrait de Michael est devenu le logo (0.4.3), des statistiques d'usage anonymes en
+> opt-out documentées publiquement (0.4.2), et le vocabulaire de l'application aligné sur
+> celui du site (0.4.1).
+> **Si vous êtes en 0.3.8, mettez à jour :** le garde-fou de limite d'usage de cette version ne relâchait jamais les agents qu'il retenait,
+> et il a été entièrement supprimé.
+> Les builds macOS (signé et notarié), Windows, et Linux sont sur la
+> [page des releases](https://github.com/chaitanyagiri/munder-difflin/releases/latest).
 
-<div align="right">(<a href="#munder-difflin">↑ back to top</a>)</div>
+<div align="right">(<a href="#munder-difflin">↑ retour en haut</a>)</div>
 
-## Getting started
+## Démarrage
 
-### Prerequisites
+### Prérequis
 
-- **macOS, Windows, or Linux**.
-- **Node.js 18+** and npm.
-- A **C/C++ toolchain** for `node-pty`'s native addon — on macOS, install Xcode Command Line Tools:
+- **macOS, Windows, ou Linux**.
+- **Node.js 18+** et npm.
+- Une **chaîne d'outils C/C++** pour l'addon natif de `node-pty` — sur macOS, installez les Xcode Command Line Tools :
   ```bash
   xcode-select --install
   ```
-- At least one supported agent CLI on your `PATH` — **[Claude Code](https://claude.com/claude-code)**
-  (`claude`, the default), **Antigravity** (`agy`), **OpenAI Codex** (`codex`), **xAI Grok** (`grok`),
+- Au moins un CLI d'agent pris en charge dans votre `PATH` — **[Claude Code](https://claude.com/claude-code)**
+  (`claude`, celui par défaut), **Antigravity** (`agy`), **OpenAI Codex** (`codex`), **xAI Grok** (`grok`),
   **Kimi Code** (`kimi`), **Qwen** (`qwen`), **OpenCode** (`opencode`), **Crush** (`crush`),
-  **pi.dev** (`pi`), or **GitHub Copilot** (`copilot`). Most missing CLIs self-heal: the harness runs the installer in the
-  terminal and continues into the new binary.
-- *Optional:* **your own API keys and local LLMs** in **Settings → AI Engines** (Ollama / LM Studio / vLLM).
-- *Optional:* the semantic memory index for instant cross-session recall — markdown memory works without it.
+  **pi.dev** (`pi`), ou **GitHub Copilot** (`copilot`). La plupart des CLI manquants s'auto-réparent : le harnais lance l'installateur dans le
+  terminal et continue vers le nouveau binaire.
+- *Optionnel :* **vos propres clés API et LLM locaux** dans **Réglages → Moteurs IA** (Ollama / LM Studio / vLLM).
+- *Optionnel :* l'index de mémoire sémantique pour un rappel instantané inter-sessions — la mémoire markdown fonctionne sans.
 
-### Install & run
+### Installation et lancement
 
 ```bash
 git clone https://github.com/chaitanyagiri/munder-difflin.git
 cd munder-difflin
-npm install        # postinstall rebuilds node-pty against Electron's ABI
-npm run dev        # launches the Electron app with hot reload
+npm install        # le postinstall recompile node-pty pour l'ABI d'Electron
+npm run dev        # lance l'application Electron avec rechargement à chaud
 ```
 
-On first launch you'll go through the onboarding wizard, then land on the floor. Use **Add agent** to
-spawn your first session — the GOD agent seats itself in Michael's office automatically.
+Au premier lancement, vous passerez par l'assistant d'accueil, puis atterrirez sur le plateau. Utilisez **Ajouter un agent** pour
+créer votre première session — l'agent DIEU s'installe automatiquement dans le bureau de Michael.
 
-### Other scripts
+### Autres scripts
 
 ```bash
-npm run build      # production build via electron-vite
-npm run preview    # preview the production build
-npm run typecheck  # type-check the node (main/preload) and web (renderer) projects
+npm run build      # build de production via electron-vite
+npm run preview    # aperçu du build de production
+npm run typecheck  # vérifie les types des projets node (main/preload) et web (renderer)
 ```
 
-> If `node-pty` fails to load after an Electron upgrade, re-run `npm install` (the `postinstall` hook
-> runs `electron-rebuild` against the current Electron ABI).
+> Si `node-pty` ne se charge plus après une mise à jour d'Electron, relancez `npm install` (le hook `postinstall`
+> relance `electron-rebuild` pour l'ABI d'Electron actuelle).
 
 ## Architecture
 
-Two data planes feed one renderer:
+Deux plans de données alimentent un seul renderer :
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│                     Electron Renderer (React)                  │
+│                Renderer Electron (React)                        │
 │   ┌──────────────────┐    ┌──────────────────────────────┐    │
-│   │ Office Floor      │    │ Terminal + Command Bar       │    │
-│   │ (Pixi.js)        │    │ Files + Git tabs (xterm.js)  │    │
+│   │ Plateau de bureau │    │ Terminal + barre de commande │    │
+│   │ (Pixi.js)        │    │ Onglets Fichiers + Git (xterm.js) │
 │   └─────────▲────────┘    └────────────▲─────────────────┘    │
-│             │ avatar state             │ pty bytes / fs / git  │
+│             │ état de l'avatar          │ octets pty / fs / git │
 └─────────────┼──────────────────────────┼───────────────────────┘
-              │ IPC (contextBridge: window.cth)
+              │ IPC (contextBridge : window.cth)
        ┌──────┴──────────┐        ┌──────┴─────────────┐
-       │  Event Plane    │        │  Terminal Plane    │
-       │  hooks / hive   │        │  node-pty PTYs     │
-       │  router + GOD   │        │  + fs + git        │
+       │ Plan Événements │        │  Plan Terminal      │
+       │  hooks / hive   │        │  PTYs node-pty      │
+       │  routeur + DIEU │        │  + fs + git         │
        └────────▲────────┘        └──────▲─────────────┘
-                │ hook payloads          │ stdin / stdout
+                │ charges utiles hook    │ stdin / stdout
                 └─────────┬──────────────┘
                    ┌──────┴──────────────┐
                    │ claude / agy / codex│
                    └─────────────────────┘
 ```
 
-- **Terminal plane.** The main process owns a `PtyManager` that spawns each agent as a `node-pty`
-  process and streams output over per-id IPC (`pty:data:<id>`). The renderer talks only through a
-  typed `window.cth` bridge ([`src/preload/index.ts`](./src/preload/index.ts)), which also exposes
-  sandboxed filesystem and git helpers.
-- **Hive / event plane.** `hive.ts` is the on-disk multi-agent layer; `hooks.ts` runs the hook
-  server that provider bridges POST lifecycle payloads to (`cth-hook` for Claude Code, `agy-hook`
-  for Antigravity). `memory.ts` wraps the semantic memory CLI. The router delivers messages, drains
-  provider outboxes, the GOD agent adjudicates, and idle/inbox wakeups keep workers draining mail.
+- **Plan terminal.** Le processus principal possède un `PtyManager` qui crée chaque agent comme un
+  processus `node-pty` et transmet la sortie via IPC par identifiant (`pty:data:<id>`). Le renderer ne parle qu'à travers un
+  pont `window.cth` typé ([`src/preload/index.ts`](./src/preload/index.ts)), qui expose aussi des
+  aides fichiers et git en bac à sable.
+- **Plan ruche / événements.** `hive.ts` est la couche multi-agents sur disque ; `hooks.ts` fait tourner le serveur de hooks
+  vers lequel les ponts de fournisseurs POSTent les charges utiles de cycle de vie (`cth-hook` pour Claude Code, `agy-hook`
+  pour Antigravity). `memory.ts` enveloppe le CLI de mémoire sémantique. Le routeur livre les messages, vide les
+  boîtes d'envoi des fournisseurs, l'agent DIEU arbitre, et les réveils d'inactivité/boîte de réception gardent les travailleurs en train de vider leur courrier.
 
-## Project structure
+## Structure du projet
 
 ```
 src/
-  main/                      Electron main process (Node)
-    index.ts                 window, IPC handlers, quit guard
-    pty.ts                   node-pty manager (spawn/write/resize/kill/stream)
-    hive.ts                  on-disk multi-agent layer (memory, mailboxes, router)
-    hooks.ts                 hook server + provider hook shims (`cth-hook`, `agy-hook`)
-    memory.ts                semantic memory layer (CLI wrapper, degrade-to-noop)
-    config.ts                harness config persistence + home setup
-    transcript.ts            reads ~/.claude/projects/ JSONL transcripts for real token/cost telemetry
-    telemetry.ts             live OTel collector + usage/cost feed for observability
-    usage.ts / pricing.ts    UsageProvider seam + per-model cost attribution
-    breaker.ts / control.ts  cost/runaway circuit breaker (steer/constrain/stop) + HITL gate / steer / stop
-    reflect.ts               MemoryReflector — memory condensation
-    db.ts                    SQLite durable store (window bounds + history) + durable cost ledger
-    github.ts                GitHub issue + CI run ingestion via the gh CLI
-    shellEnv.ts              resolve PATH and shell env for child processes
-    fs.ts / git.ts           sandboxed filesystem + git bridges
-  preload/                   contextBridge → typed window.cth API
+  main/                      Processus principal Electron (Node)
+    index.ts                 fenêtre, gestionnaires IPC, garde de fermeture
+    pty.ts                   gestionnaire node-pty (spawn/write/resize/kill/stream)
+    hive.ts                  couche multi-agents sur disque (mémoire, boîtes aux lettres, routeur)
+    hooks.ts                 serveur de hooks + shims de hooks par fournisseur (`cth-hook`, `agy-hook`)
+    memory.ts                couche de mémoire sémantique (wrapper CLI, dégradation en no-op)
+    config.ts                persistance de la config du harnais + configuration du dossier principal
+    transcript.ts            lit les transcriptions JSONL de ~/.claude/projects/ pour une télémétrie réelle de tokens/coûts
+    telemetry.ts             collecteur OTel en direct + flux d'usage/coûts pour l'observabilité
+    usage.ts / pricing.ts    seam UsageProvider + attribution des coûts par modèle
+    breaker.ts / control.ts  disjoncteur coût/emballement (orienter/contraindre/arrêter) + porte HITL / orientation / arrêt
+    reflect.ts               MemoryReflector — condensation de la mémoire
+    db.ts                    stockage durable SQLite (limites de fenêtre + historique) + registre de coûts durable
+    github.ts                ingestion des issues GitHub + runs de CI via le CLI gh
+    shellEnv.ts               résout le PATH et l'environnement shell des processus enfants
+    fs.ts / git.ts           ponts fichiers + git en bac à sable
+  preload/                   contextBridge → API window.cth typée
   renderer/src/
-    App.tsx                  top-level layout + wiring
-    design/                  tokens.css / tokens.ts / global.css (design source of truth)
+    App.tsx                  mise en page de haut niveau + câblage
+    design/                  tokens.css / tokens.ts / global.css (source de vérité du design)
     components/              PixelPanel, AgentDetailPanel, CommandBar, ApprovalsPanel, MemoryPanel, …
-    CommandCenterPanel,      Michael's control surface (Terminal/Floor/Memory/Activity/Tasks/Triggers/Handbook tabs)
-    ToolWaterfall,           per-agent tool-span waterfall for the observability view
-    TasksKanban,             dependency-aware kanban board (Tasks tab)
-    ThreadsPanel,            hive message conversation viewer (Messages tab)
-    MessageQueueComposer,    park messages for a busy agent
-    scene/office/            Pixi office floor: OfficeFloor, Character, Camera, cast, pathfinding, …
-    store/ · hooks/          zustand store, event loop, PTY parser, typewriter
-    assets/                  tilesets, maps, character sheets (see ATTRIBUTION.md)
-docs/                        `logo.png`, `banner.png`, landing page (GitHub Pages → munderdiffl.in)
-docs/media/                  `og.png` (social previews) + rendered Remotion clips
-landing-remotion/            Remotion project that renders the landing page's "how it works" clips
-HIVE.md · SPEC.md · DESIGN.md   multi-agent · terminal/event · visual design
-docs/message-queue.md        who may type into an agent's terminal, and when
+    CommandCenterPanel,      surface de contrôle de Michael (onglets Terminal/Plateau/Mémoire/Activité/Tâches/Déclencheurs/Manuel)
+    ToolWaterfall,           cascade des spans d'outils par agent pour la vue d'observabilité
+    TasksKanban,             tableau kanban avec dépendances (onglet Tâches)
+    ThreadsPanel,            visualiseur de conversations de messages de la ruche (onglet Messages)
+    MessageQueueComposer,    mise en attente de messages pour un agent occupé
+    scene/office/            plateau de bureau Pixi : OfficeFloor, Character, Camera, cast, pathfinding, …
+    store/ · hooks/          store zustand, boucle d'événements, parseur PTY, machine à écrire
+    assets/                  tilesets, cartes, planches de personnages (voir ATTRIBUTION.md)
+docs/                        `logo.png`, `banner.png`, page d'atterrissage (GitHub Pages → munderdiffl.in)
+docs/media/                  `og.png` (aperçus sociaux) + clips Remotion rendus
+landing-remotion/            projet Remotion qui rend les clips "comment ça marche" de la page d'atterrissage
+HIVE.md · SPEC.md · DESIGN.md   multi-agents · terminal/événements · design visuel
+docs/message-queue.md        qui peut taper dans le terminal d'un agent, et quand
 ```
 
-<div align="right">(<a href="#munder-difflin">↑ back to top</a>)</div>
+<div align="right">(<a href="#munder-difflin">↑ retour en haut</a>)</div>
 
-## Design system
+## Système de design
 
-The aesthetic is **Animal Crossing × Earthbound × SNES menu UI** — pixel-snapped, chunky, friendly.
-[`DESIGN.md`](./DESIGN.md) is canonical; every component derives from its tokens. The Munder Difflin
-brand layers a **Dunder-Mifflin maroon** (`#6E1423`) and **gold** (`#F4D35E`) on top for logo and
-chrome. The 15 avatars are the cast of *The Office*, differentiated by hair/skin/shirt recipes.
+L'esthétique est **Animal Crossing × Earthbound × UI de menu SNES** — aligné sur la grille de pixels, trapu, chaleureux.
+[`DESIGN.md`](./DESIGN.md) fait référence ; chaque composant dérive de ses tokens. La marque Munder Difflin
+superpose un **bordeaux Dunder-Mifflin** (`#6E1423`) et un **or** (`#F4D35E`) pour le logo et le
+chrome. Les 15 avatars sont le casting de *The Office*, différenciés par des recettes de cheveux/peau/chemise.
 
-## Roadmap
+## Feuille de route
 
-Shipped through **v0.4.4** — ten agent engines with BYOK keys and local LLMs, voice orchestration,
-the hive (memory · mailboxes · blackboard · event log), Command Center with kanban and schedules,
-a built-in Monaco IDE with git rails, integrations registry + secret broker, Slack-spawned workers,
-shareable hires and the Agent Gallery, observability and the circuit breaker, durable persistence,
-session resume, multi-window floors, and working auto-update.
-Full history in [`CHANGELOG.md`](./CHANGELOG.md).
+Livré jusqu'à la **v0.4.4** — dix moteurs d'agents avec clés BYOK et LLM locaux, orchestration vocale,
+la ruche (mémoire · boîtes aux lettres · tableau blanc · journal d'événements), Centre de commande avec kanban et plannings,
+un IDE Monaco intégré avec rails git, registre d'intégrations + courtier de secrets, travailleurs créés depuis Slack,
+hires partageables et Galerie d'agents, observabilité et disjoncteur, persistance durable,
+reprise de session, plateaux multi-fenêtres, et mise à jour automatique fonctionnelle.
+Historique complet dans [`CHANGELOG.md`](./CHANGELOG.md).
 
-Next up:
+À venir :
 
-- [ ] **More chat integrations** — Telegram and richer chat bridges that pipe a channel into Michael's queue and route replies back out.
-- [ ] **More engines & integration templates** — keep growing the engine roster and the integrations registry.
-- [ ] **Fuller avatar coverage** — drive the remaining station visits and tool-bubbles entirely from real hook events.
-- [ ] **Durable layout & command history** — extend persistence to agent layout and per-session history.
+- [ ] **Plus d'intégrations de chat** — Telegram et des ponts de chat plus riches qui font remonter un canal dans la file de Michael et renvoient les réponses.
+- [ ] **Plus de moteurs et de modèles d'intégration** — continuer à faire grandir le catalogue de moteurs et le registre d'intégrations.
+- [ ] **Couverture d'avatar plus complète** — piloter entièrement les visites de poste restantes et les bulles d'outil depuis de vrais événements de hook.
+- [ ] **Mise en page et historique de commandes durables** — étendre la persistance à la mise en page des agents et à l'historique par session.
 
-<div align="right">(<a href="#munder-difflin">↑ back to top</a>)</div>
+<div align="right">(<a href="#munder-difflin">↑ retour en haut</a>)</div>
 
-## Contributing
+## Contribuer
 
-Contributions are welcome — this is an early prototype with a lot of surface area. Start with
-[`CONTRIBUTING.md`](./CONTRIBUTING.md). The short version: fork, `npm install && npm run dev`, keep
-`npm run typecheck` green, and **derive any new UI from [`DESIGN.md`](./DESIGN.md) tokens**. Good
-first areas: wiring real hook events, the add-agent flow, the config drawer, and cross-platform work.
+Les contributions sont bienvenues — c'est un prototype précoce avec une grande surface. Commencez par
+[`CONTRIBUTING.md`](./CONTRIBUTING.md). En bref : forkez, `npm install && npm run dev`, gardez
+`npm run typecheck` au vert, et **dérivez toute nouvelle UI des tokens de [`DESIGN.md`](./DESIGN.md)**. Bonnes
+zones de départ : câbler de vrais événements de hook, le flux d'ajout d'agent, le tiroir de configuration, et le travail multiplateforme.
 
-## Telemetry
+## Télémétrie
 
-Official builds send a **small set of anonymous usage events** (app opened, agent spawned, feature
-used) — never prompts, code, file paths, or agent output. The complete event list, the anonymity
-guarantees, and the three ways to opt out (Settings toggle, `DO_NOT_TRACK`, or building from
-source — forks compile with no key and send nothing) are documented in
+Les builds officiels envoient un **petit ensemble d'événements d'usage anonymes** (application ouverte, agent créé, fonctionnalité
+utilisée) — jamais de prompts, de code, de chemins de fichiers, ou de sortie d'agent. La liste complète des événements, les
+garanties d'anonymat, et les trois façons de désactiver (bascule dans Réglages, `DO_NOT_TRACK`, ou compiler depuis les
+sources — les forks compilent sans clé et n'envoient rien) sont documentées dans
 [`TELEMETRY.md`](./TELEMETRY.md).
 
-## License
+## Licence
 
 > [!IMPORTANT]
-> **Asset licensing.** The bundled pixel art (tilesets, maps, and the base character sheets the
-> Office cast is recolored from) comes from [LimeZu](https://limezu.itch.io/) via
-> [`shahar061/the-office`](https://github.com/shahar061/the-office) under the **LimeZu FREE VERSION
-> license — non-commercial use only**. The recolored sprites inherit that restriction. See
-> [`src/renderer/src/assets/ATTRIBUTION.md`](./src/renderer/src/assets/ATTRIBUTION.md). **To
-> commercialize, replace these assets or obtain a paid LimeZu license.**
+> **Licence des assets.** Le pixel art fourni (tilesets, cartes, et les planches de personnages de base dont
+> le casting de l'Office est recoloré) provient de [LimeZu](https://limezu.itch.io/) via
+> [`shahar061/the-office`](https://github.com/shahar061/the-office) sous la **licence LimeZu FREE VERSION —
+> usage non commercial uniquement**. Les sprites recolorés héritent de cette restriction. Voir
+> [`src/renderer/src/assets/ATTRIBUTION.md`](./src/renderer/src/assets/ATTRIBUTION.md). **Pour
+> commercialiser, remplacez ces assets ou obtenez une licence LimeZu payante.**
 
-The **source code** is licensed under the **MIT License** — see [`LICENSE`](./LICENSE). The MIT grant
-covers the code only; the non-commercial asset restriction above is carved out in the `LICENSE` scope
-note. *Munder Difflin* is an affectionate parody and is not affiliated with NBC's *The Office* or
+Le **code source** est sous licence **MIT** — voir [`LICENSE`](./LICENSE). Le grant MIT
+ne couvre que le code ; la restriction non commerciale sur les assets ci-dessus est exclue dans la note de
+portée du `LICENSE`. *Munder Difflin* est une parodie affectueuse et n'est pas affilié à *The Office* de NBC ni à
 Dunder Mifflin.
 
-## Acknowledgements
+## Remerciements
 
-- [LimeZu](https://limezu.itch.io/) — pixel-art tilesets and character base sheets.
-- [`shahar061/the-office`](https://github.com/shahar061/the-office) — office tileset/map vendoring.
-- [Pixi.js](https://pixijs.com/) · [xterm.js](https://xtermjs.org/) · [node-pty](https://github.com/microsoft/node-pty) · [electron-vite](https://electron-vite.org/) · [CodeMirror](https://codemirror.net/) — the libraries this is built on.
-- [Remotion](https://www.remotion.dev/) — the landing page's animated "how it works" clips (`landing-remotion/`).
-- *The Office* (US) — for Munder Difflin, Inc.
+- [LimeZu](https://limezu.itch.io/) — tilesets pixel art et planches de personnages de base.
+- [`shahar061/the-office`](https://github.com/shahar061/the-office) — vendoring du tileset/de la carte de bureau.
+- [Pixi.js](https://pixijs.com/) · [xterm.js](https://xtermjs.org/) · [node-pty](https://github.com/microsoft/node-pty) · [electron-vite](https://electron-vite.org/) · [CodeMirror](https://codemirror.net/) — les bibliothèques sur lesquelles ceci est construit.
+- [Remotion](https://www.remotion.dev/) — les clips animés "comment ça marche" de la page d'atterrissage (`landing-remotion/`).
+- *The Office* (US) — pour Munder Difflin, Inc.
+
+---
+
+*Ce README est la version par défaut. La version anglaise (`README.en.md`) est une traduction et peut prendre du retard.*
