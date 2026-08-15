@@ -16,12 +16,14 @@ import { GitTab } from './GitTab';
 import { Icon } from './Icon';
 import { useStore, type Agent } from '@/store/store';
 import { usePtyParser } from '@/hooks/usePtyParser';
+import { useT } from '@/i18n';
 
 export interface AgentDetailPanelProps {
   agent: Agent;
 }
 
 export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
+  const t = useT();
   const [openTerminalState, setOpenTerminalState] = useState<'idle' | 'opening' | 'ok' | 'error'>('idle');
   const [openTerminalError, setOpenTerminalError] = useState<string | undefined>();
   const archiveAgent = useStore(s => s.archiveAgent);
@@ -53,7 +55,7 @@ export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
         setTimeout(() => setOpenTerminalState('idle'), 1500);
       } else {
         setOpenTerminalState('error');
-        setOpenTerminalError(result.error ?? 'unknown error');
+        setOpenTerminalError(result.error ?? t('agentDetailPanel.unknownError', 'unknown error'));
         setTimeout(() => setOpenTerminalState('idle'), 4000);
       }
     } catch (e) {
@@ -65,7 +67,7 @@ export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
 
   const onKill = async () => {
     if (!agent.ptyId) return;
-    if (!confirm(`Close ${agent.name}? The PTY process will terminate and the agent is archived (kept in history, off the floor).`)) return;
+    if (!confirm(t('agentDetailPanel.confirmClose', 'Close {name}? The PTY process will terminate and the agent is archived (kept in history, off the floor).', { name: agent.name }))) return;
     await window.cth.killPty(agent.ptyId);
     disposeTerminal(agent.ptyId);
     archiveAgent(agent.id);
@@ -120,14 +122,14 @@ export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
         {/* v0.3.4: the IDE lives at agent level (replaces the old files tab) —
             opens the full-window Monaco editor rooted at this agent's workspace. */}
         <PixelButton variant="secondary" size="sm" onClick={() => useStore.getState().setIdeOpen(true)}>
-          <span title={`Open the IDE — file editor + git diff for ${agent.project}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span title={t('agentDetailPanel.openIde', 'Open the IDE — file editor + git diff for {project}', { project: agent.project })} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Icon name="code" /> IDE
           </span>
         </PixelButton>
         <PixelButton variant="secondary" size="sm" onClick={openTerminal} disabled={openTerminalState === 'opening'}>
-          <span title={`open Terminal.app at ${agent.cwd}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span title={t('agentDetailPanel.openTerminalAt', 'open Terminal.app at {cwd}', { cwd: agent.cwd })} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Icon name="terminal" />
-            {openTerminalState === 'opening' ? '...' : openTerminalState === 'ok' ? 'ok' : openTerminalState === 'error' ? 'err' : 'open'}
+            {openTerminalState === 'opening' ? '...' : openTerminalState === 'ok' ? t('agentDetailPanel.ok', 'ok') : openTerminalState === 'error' ? t('agentDetailPanel.err', 'err') : t('agentDetailPanel.open', 'open')}
           </span>
         </PixelButton>
         {isReal && (
@@ -157,8 +159,8 @@ export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
         {sidebarTab === 'terminal' && (
           isReal && agent.ptyId ? (
             isFullscreenedHere ? (
-              <EmptyTab title="In fullscreen">
-                This terminal is open in fullscreen. Press Esc or exit fullscreen to bring it back here.
+              <EmptyTab title={t('agentDetailPanel.inFullscreen.title', 'In fullscreen')}>
+                {t('agentDetailPanel.inFullscreen.body', 'This terminal is open in fullscreen. Press Esc or exit fullscreen to bring it back here.')}
               </EmptyTab>
             ) : (
             <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
@@ -183,8 +185,8 @@ export function AgentDetailPanel({ agent }: AgentDetailPanelProps) {
             </div>
             )
           ) : (
-            <EmptyTab title="No PTY">
-              This agent has no live terminal. Spawn an agent through "add agent" to use the terminal tab.
+            <EmptyTab title={t('agentDetailPanel.noPty.title', 'No PTY')}>
+              {t('agentDetailPanel.noPty.body', 'This agent has no live terminal. Spawn an agent through "add agent" to use the terminal tab.')}
             </EmptyTab>
           )
         )}

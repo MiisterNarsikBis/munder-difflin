@@ -3,6 +3,7 @@ import { PixelButton } from './PixelButton';
 import { PixelBadge } from './PixelBadge';
 import { useStore } from '@/store/store';
 import { type HiveTask, openQuestion, waitsOnHuman } from './TasksKanban';
+import { useT } from '@/i18n';
 
 /**
  * ASK ME — first-class human feedback through the task system.
@@ -40,6 +41,7 @@ function dependentsTree(id: string, all: HiveTask[], seen = new Set<string>()): 
 }
 
 export function AskMeTab() {
+  const t = useT();
   const agents = useStore((s) => s.agents);
   const restorable = useStore((s) => s.restorableAgents);
   const [tasks, setTasks] = useState<HiveTask[]>([]);
@@ -134,18 +136,17 @@ export function AskMeTab() {
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', background: 'var(--cth-paper-200)', padding: 10, display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'var(--cth-font-mono)' }}>
       {waiting.length === 0 && (
         <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--cth-ink-500)', fontSize: 12 }}>
-          Nothing needs you right now. 🌿<br />
+          {t('askMeTab.empty.title', 'Nothing needs you right now. 🌿')}<br />
           <span style={{ fontSize: 11, color: 'var(--cth-ink-300)' }}>
-            When the team blocks a task on your input — a question to answer or a to-do only
-            you can perform — it shows up here (and on the ASK ME board on the floor).
+            {t('askMeTab.empty.body', 'When the team blocks a task on your input — a question to answer or a to-do only you can perform — it shows up here (and on the ASK ME board on the floor).')}
           </span>
         </div>
       )}
-      {waiting.map((t) => {
-        const open = openQuestion(t)!;
-        const stuck = dependentsTree(t.id, tasks);
+      {waiting.map((task) => {
+        const open = openQuestion(task)!;
+        const stuck = dependentsTree(task.id, tasks);
         return (
-          <div key={t.id} style={{
+          <div key={task.id} style={{
             background: 'var(--cth-paper-100)', boxShadow: 'inset 0 0 0 1px var(--cth-ink-100)',
             display: 'flex', flexDirection: 'column'
           }}>
@@ -155,33 +156,33 @@ export function AskMeTab() {
               background: 'var(--cth-lilac-light, #ece2f5)', boxShadow: 'inset 0 -1px 0 var(--cth-ink-700)'
             }}>
               <button
-                onClick={() => openTaskDetail(t.id)}
-                title="open the full task detail"
+                onClick={() => openTaskDetail(task.id)}
+                title={t('askMeTab.openFullDetail', 'open the full task detail')}
                 style={{
                   border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, textAlign: 'left',
                   fontFamily: 'var(--cth-font-mono)', fontSize: 15, color: 'var(--cth-ink-900)',
                   flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                 }}
               >
-                {t.title}
+                {task.title}
               </button>
-              {nameFor(t.assignee) && <PixelBadge status="blocked" label={nameFor(t.assignee)!} />}
+              {nameFor(task.assignee) && <PixelBadge status="blocked" label={nameFor(task.assignee)!} />}
               {/* Dismiss — clears this ask off the board without answering it.
                   The card's Q&A history is preserved (the question stays on the
                   card, just marked dismissed). */}
               <button
-                onClick={() => void dismiss(t)}
-                disabled={sending === t.id}
-                title="dismiss — clear this off the ASK ME board without answering (history kept)"
-                aria-label="dismiss this ask"
+                onClick={() => void dismiss(task)}
+                disabled={sending === task.id}
+                title={t('askMeTab.dismissTitle', 'dismiss — clear this off the ASK ME board without answering (history kept)')}
+                aria-label={t('askMeTab.dismissAria', 'dismiss this ask')}
                 style={{
                   flexShrink: 0, width: 18, height: 18, padding: 0, marginLeft: 2,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
-                  border: 'none', cursor: sending === t.id ? 'default' : 'pointer',
+                  border: 'none', cursor: sending === task.id ? 'default' : 'pointer',
                   background: 'transparent', color: 'var(--cth-ink-500)',
                   fontFamily: 'var(--cth-font-ui)', fontSize: 13
                 }}
-                onMouseEnter={(e) => { if (sending !== t.id) e.currentTarget.style.color = 'var(--cth-coral)'; }}
+                onMouseEnter={(e) => { if (sending !== task.id) e.currentTarget.style.color = 'var(--cth-coral)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--cth-ink-500)'; }}
               >✕</button>
             </div>
@@ -194,11 +195,11 @@ export function AskMeTab() {
 
               {/* answer box */}
               <textarea
-                value={drafts[t.id] ?? ''}
-                onChange={(e) => setAnswerDraft(t.id, e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) void sendAnswer(t); }}
+                value={drafts[task.id] ?? ''}
+                onChange={(e) => setAnswerDraft(task.id, e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) void sendAnswer(task); }}
                 rows={3}
-                placeholder="Your answer — or 'done', with the result… (Ctrl+Enter to send)"
+                placeholder={t('askMeTab.answerPlaceholder', "Your answer — or 'done', with the result… (Ctrl+Enter to send)")}
                 style={{
                   width: '100%', boxSizing: 'border-box', padding: '6px 8px', resize: 'vertical',
                   background: 'var(--cth-paper-100)', border: 'none',
@@ -210,22 +211,24 @@ export function AskMeTab() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <PixelButton
                   variant="primary" size="sm"
-                  disabled={!(drafts[t.id] ?? '').trim() || sending === t.id}
-                  onClick={() => void sendAnswer(t)}
+                  disabled={!(drafts[task.id] ?? '').trim() || sending === task.id}
+                  onClick={() => void sendAnswer(task)}
                 >
-                  {sending === t.id ? 'sending…' : 'respond & unblock'}
+                  {sending === task.id ? t('askMeTab.sending', 'sending…') : t('askMeTab.respondAndUnblock', 'respond & unblock')}
                 </PixelButton>
-                {(t.humanQA?.filter((e) => e.a).length ?? 0) > 0 && (
+                {(task.humanQA?.filter((e) => e.a).length ?? 0) > 0 && (
                   <button
-                    onClick={() => openTaskDetail(t.id)}
-                    title="open the task detail with the full Q&A history"
+                    onClick={() => openTaskDetail(task.id)}
+                    title={t('askMeTab.viewHistoryTitle', 'open the task detail with the full Q&A history')}
                     style={{
                       border: 'none', background: 'transparent', cursor: 'pointer', padding: 0,
                       fontSize: 10, color: 'var(--cth-ink-700)', fontFamily: 'var(--cth-font-display)',
                       textDecoration: 'underline'
                     }}
                   >
-                    VIEW {t.humanQA!.filter((e) => e.a).length} EARLIER ANSWER{t.humanQA!.filter((e) => e.a).length === 1 ? '' : 'S'}
+                    {task.humanQA!.filter((e) => e.a).length === 1
+                      ? t('askMeTab.viewEarlierAnswer.one', 'VIEW {n} EARLIER ANSWER', { n: task.humanQA!.filter((e) => e.a).length })
+                      : t('askMeTab.viewEarlierAnswer.many', 'VIEW {n} EARLIER ANSWERS', { n: task.humanQA!.filter((e) => e.a).length })}
                   </button>
                 )}
               </div>
@@ -234,7 +237,9 @@ export function AskMeTab() {
               {stuck.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <div style={{ fontFamily: 'var(--cth-font-display)', fontSize: 8, color: 'var(--cth-coral)' }}>
-                    BLOCKING {stuck.length} DOWNSTREAM TASK{stuck.length === 1 ? '' : 'S'}
+                    {stuck.length === 1
+                      ? t('askMeTab.blocking.one', 'BLOCKING {n} DOWNSTREAM TASK', { n: stuck.length })
+                      : t('askMeTab.blocking.many', 'BLOCKING {n} DOWNSTREAM TASKS', { n: stuck.length })}
                   </div>
                   {stuck.slice(0, 6).map((d, i) => (
                     <div key={d.id} style={{
@@ -249,7 +254,7 @@ export function AskMeTab() {
                     </div>
                   ))}
                   {stuck.length > 6 && (
-                    <div style={{ paddingLeft: 14, fontSize: 11, color: 'var(--cth-ink-300)' }}>… +{stuck.length - 6} more</div>
+                    <div style={{ paddingLeft: 14, fontSize: 11, color: 'var(--cth-ink-300)' }}>{t('askMeTab.andMore', '… +{n} more', { n: stuck.length - 6 })}</div>
                   )}
                 </div>
               )}
