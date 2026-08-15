@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useT } from '@/i18n';
 
 export interface SidebarSplitterProps {
   /** Current sidebar width in px. */
@@ -18,6 +19,7 @@ export interface SidebarSplitterProps {
 export function SidebarSplitter({
   width, onChange, viewportWidth, min = 320, max = 1200
 }: SidebarSplitterProps) {
+  const t = useT();
   const startRef = useRef<{ clientX: number; width: number } | null>(null);
   const [active, setActive] = useState(false);
 
@@ -55,7 +57,7 @@ export function SidebarSplitter({
         e.preventDefault();
       }}
       onDoubleClick={() => onChange(420)}
-      title="Drag to resize · double-click to reset"
+      title={t('sidebarSplitter.dragToResize', 'Drag to resize · double-click to reset')}
       style={{
         width: 10,
         cursor: 'ew-resize',

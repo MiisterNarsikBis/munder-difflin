@@ -970,5 +970,42 @@ export const FR: Record<string, string> = {
   'updateView.settings.notAvailableButton': 'Vérifier à nouveau',
   'updateView.settings.idleHeadline': 'Vous êtes en v{v}',
   'updateView.settings.idleDetail': 'Les mises à jour sont vérifiées automatiquement toutes les 6 heures. Vérifiez maintenant si vous voulez en être sûr.',
-  'updateView.settings.idleButton': 'Vérifier les mises à jour'
+  'updateView.settings.idleButton': 'Vérifier les mises à jour',
+
+  // ── components/McpDefaultsSettings.tsx ────────────────────────────────────
+  'mcpDefaultsSettings.enabled': 'activé',
+  'mcpDefaultsSettings.disabled': 'désactivé',
+  'mcpDefaultsSettings.couldNotSave': 'impossible d’enregistrer',
+  'mcpDefaultsSettings.title': 'Serveurs MCP par défaut',
+  'mcpDefaultsSettings.blurb': 'Ces serveurs sont fusionnés dans les paramètres de session de chaque nouvel agent. Les serveurs sûrs sont activés par défaut ; les serveurs d’écriture/secret sont désactivés jusqu’à votre consentement. Les changements s’appliquent au prochain lancement d’agent — les agents en cours ne sont pas affectés.',
+  'mcpDefaultsSettings.on': 'oui',
+  'mcpDefaultsSettings.off': 'non',
+  'mcpDefaultsSettings.tier.safeReadonlyLabel': 'Sûr et lecture seule (activé par défaut)',
+  'mcpDefaultsSettings.tier.writeLabel': 'Accès en écriture (consentement requis)',
+  'mcpDefaultsSettings.tier.secretLabel': 'Secret / clé API requis (consentement requis)',
+  'mcpDefaultsSettings.tier.safeReadonlyNote': 'Ces serveurs se contentent de lire des données, ne nécessitent aucun secret et sont limités à l’espace de travail de l’agent. Ils sont activés pour chaque nouvel agent.',
+  'mcpDefaultsSettings.tier.writeNote': 'Ces serveurs peuvent modifier des états au-delà de l’espace de travail. Désactivés par défaut — n’activez qu’après vérification.',
+  'mcpDefaultsSettings.tier.secretNote': 'Ces serveurs nécessitent une clé API ou des identifiants. Désactivés par défaut — ajoutez vos identifiants puis activez après consentement.',
+
+  // ── components/MichaelBooting.tsx ─────────────────────────────────────────
+  'michaelBooting.clockingIn': 'PRISE DE POSTE',
+  'michaelBooting.blurb': 'Michael s’installe dans le bureau du fond et prépare le plateau. Un instant…',
+
+  // ── components/SidebarSplitter.tsx ────────────────────────────────────────
+  'sidebarSplitter.dragToResize': 'Glisser pour redimensionner · double-clic pour réinitialiser',
+
+  // ── components/AgentControlStrip.tsx ──────────────────────────────────────
+  'agentControlStrip.resumed': 'repris',
+  'agentControlStrip.pausedNote': 'en pause — les appels d’outils seront refusés',
+  'agentControlStrip.haltRequested': 'arrêt demandé — s’arrête proprement au prochain hook',
+  'agentControlStrip.steerQueued': 'orientation mise en file — livrée au prochain tour',
+  'agentControlStrip.control': 'CONTRÔLE',
+  'agentControlStrip.resume': 'reprendre',
+  'agentControlStrip.pause': 'pause',
+  'agentControlStrip.halt': 'arrêter',
+  'agentControlStrip.deliveryPausedFloor': 'livraison en pause (plateau)',
+  'agentControlStrip.haltingEllipsis': 'arrêt en cours…',
+  'agentControlStrip.steerQueuedCount': '{n} orientation(s) en file',
+  'agentControlStrip.steerPlaceholder': 'orienter cet agent (injecté comme contexte, sans taper dans son terminal)…',
+  'agentControlStrip.steer': 'orienter'
 };
