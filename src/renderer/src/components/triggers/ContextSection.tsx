@@ -5,6 +5,7 @@ import {
   Callout, Field, Hint, IntervalPicker, Muted, PctField, SubCard, SubHeader, Toggle,
   fmtInterval, textareaStyle
 } from './ui';
+import { useT } from '@/i18n';
 
 /**
  * CONTEXT — the trigger that fires on an agent's own terminal filling up rather
@@ -15,6 +16,7 @@ import {
 const WRITE_DEBOUNCE_MS = 400;
 
 export function ContextSection({ onSummary }: { onSummary?: (s: string) => void }) {
+  const t = useT();
   const [cfg, setCfg] = useState<ContextTriggerConfig | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -29,9 +31,12 @@ export function ContextSection({ onSummary }: { onSummary?: (s: string) => void 
 
   useEffect(() => {
     if (!cfg) return;
-    const on = [cfg.compact.enabled ? 'compact' : null, cfg.clear.enabled ? 'clear' : null].filter(Boolean);
-    onSummary?.(on.length ? on.join(' + ') : 'both off');
-  }, [cfg, onSummary]);
+    const on = [
+      cfg.compact.enabled ? t('contextSection.compactWord', 'compact') : null,
+      cfg.clear.enabled ? t('contextSection.clearWord', 'clear') : null
+    ].filter(Boolean);
+    onSummary?.(on.length ? on.join(' + ') : t('contextSection.bothOff', 'both off'));
+  }, [cfg, onSummary, t]);
 
   // Optimistic + debounced: the controls answer instantly, and a burst of typing
   // in the message box collapses into one write instead of one per keystroke.
@@ -45,39 +50,33 @@ export function ContextSection({ onSummary }: { onSummary?: (s: string) => void 
     commit({ ...cfg, [key]: { ...cfg[key], ...fields } });
   };
 
-  if (!cfg) return <Muted>One sec…</Muted>;
+  if (!cfg) return <Muted>{t('contextSection.oneSec', 'One sec…')}</Muted>;
 
   return (
     <>
       <Muted>
-        A rule fires only when both halves agree: the gap since its last run has passed, AND that
-        agent&apos;s context is at least as full as the bar. A bar of 0% means the clock alone.
+        {t('contextSection.blurb', "A rule fires only when both halves agree: the gap since its last run has passed, AND that agent's context is at least as full as the bar. A bar of 0% means the clock alone.")}
       </Muted>
       <div style={{ height: 8 }} />
 
       <RuleCard
-        title="Compact"
-        blurb="Summarises the context so the thread keeps going."
+        title={t('contextSection.compact.title', 'Compact')}
+        blurb={t('contextSection.compact.blurb', 'Summarises the context so the thread keeps going.')}
         rule={cfg.compact}
-        messageLabel="EXTRA FOCUS"
-        messageHint="Appended to the provider's compaction command. Empty sends the bare command."
-        messagePlaceholder="What the summary must keep…"
+        messageLabel={t('contextSection.compact.messageLabel', 'EXTRA FOCUS')}
+        messageHint={t('contextSection.compact.messageHint', "Appended to the provider's compaction command. Empty sends the bare command.")}
+        messagePlaceholder={t('contextSection.compact.messagePlaceholder', 'What the summary must keep…')}
         onPatch={(fields) => patch('compact', fields)}
       />
 
       <RuleCard
-        title="Clear"
-        blurb="Discards the context. Nothing is summarised."
+        title={t('contextSection.clear.title', 'Clear')}
+        blurb={t('contextSection.clear.blurb', 'Discards the context. Nothing is summarised.')}
         rule={cfg.clear}
-        messageLabel="COMMAND"
-        messageHint="Sent literally. Empty sends the bare clear command."
+        messageLabel={t('contextSection.clear.messageLabel', 'COMMAND')}
+        messageHint={t('contextSection.clear.messageHint', 'Sent literally. Empty sends the bare clear command.')}
         messagePlaceholder="/clear"
-        caution={
-          <>
-            Clearing throws context away — it is not a smaller version of compaction. An agent
-            mid-task forgets what it was doing. Leave this off unless you keep context another way.
-          </>
-        }
+        caution={t('contextSection.clear.caution', 'Clearing throws context away — it is not a smaller version of compaction. An agent mid-task forgets what it was doing. Leave this off unless you keep context another way.')}
         onPatch={(fields) => patch('clear', fields)}
       />
     </>
@@ -94,6 +93,7 @@ function RuleCard({ title, blurb, rule, messageLabel, messageHint, messagePlaceh
   caution?: ReactNode;
   onPatch: (fields: Partial<ContextRule>) => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <SubCard>
@@ -111,13 +111,13 @@ function RuleCard({ title, blurb, rule, messageLabel, messageHint, messagePlaceh
       {!open && (
         <Hint>
           {rule.enabled
-            ? <>Every {fmtInterval(rule.everyMs)}, once context passes {rule.minContextPct}%.</>
-            : <>Off.</>}
+            ? t('contextSection.everyOncePasses', 'Every {interval}, once context passes {pct}%.', { interval: fmtInterval(rule.everyMs), pct: rule.minContextPct })
+            : t('contextSection.offDot', 'Off.')}
         </Hint>
       )}
       {open && (
         <div style={{ marginTop: 4 }}>
-          <Field label="NO SOONER THAN EVERY">
+          <Field label={t('contextSection.noSoonerThanEvery', 'NO SOONER THAN EVERY')}>
             {/* Main clamps a context cadence to 1 minute … 24 hours, so the
                 picker offers exactly that range and never labels a value it
                 cannot actually store. */}
@@ -128,16 +128,16 @@ function RuleCard({ title, blurb, rule, messageLabel, messageHint, messagePlaceh
               maxMs={86_400_000}
             />
           </Field>
-          <Field label="CONTEXT BAR">
+          <Field label={t('contextSection.contextBar', 'CONTEXT BAR')}>
             <PctField value={rule.minContextPct} onChange={(minContextPct) => onPatch({ minContextPct })} />
-            <Hint>How full the window must be before this may run. 0% = time alone.</Hint>
+            <Hint>{t('contextSection.contextBarHint', 'How full the window must be before this may run. 0% = time alone.')}</Hint>
           </Field>
-          <Field label="BAR ON BIG WINDOWS">
+          <Field label={t('contextSection.barOnBigWindows', 'BAR ON BIG WINDOWS')}>
             <PctField
               value={rule.minContextPctLargeWindow}
               onChange={(minContextPctLargeWindow) => onPatch({ minContextPctLargeWindow })}
             />
-            <Hint>Used on ~1M-token windows, where a smaller slice is still an enormous amount of text.</Hint>
+            <Hint>{t('contextSection.barOnBigWindowsHint', 'Used on ~1M-token windows, where a smaller slice is still an enormous amount of text.')}</Hint>
           </Field>
           <Field label={messageLabel}>
             <textarea

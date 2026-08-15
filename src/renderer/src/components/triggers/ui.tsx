@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { TRIGGER_MODES, type TriggerMode } from '@shared/triggers';
+import { useT, t as translate } from '@/i18n';
 
 /**
  * Shared chrome for the Triggers tab.
@@ -75,9 +76,10 @@ export function Callout({ children, tone = 'warn' }: { children: ReactNode; tone
 
 /* ─────────────────────────────── controls ────────────────────────────────── */
 
-export function Toggle({ on, onClick, onLabel = 'on', offLabel = 'off' }: {
+export function Toggle({ on, onClick, onLabel, offLabel }: {
   on: boolean; onClick: () => void; onLabel?: string; offLabel?: string;
 }) {
+  const t = useT();
   return (
     <button
       onClick={onClick}
@@ -87,7 +89,7 @@ export function Toggle({ on, onClick, onLabel = 'on', offLabel = 'off' }: {
         boxShadow: `inset 0 0 0 1px ${on ? 'var(--cth-ink-900)' : 'var(--cth-ink-700)'}`,
         fontFamily: 'var(--cth-font-ui)', fontSize: 12, color: 'var(--cth-ink-900)'
       }}
-    >{on ? onLabel : offLabel}</button>
+    >{on ? (onLabel ?? t('triggersUi.on', 'on')) : (offLabel ?? t('triggersUi.off', 'off'))}</button>
   );
 }
 
@@ -233,16 +235,37 @@ export function SubHeader({ open, onToggle, title, sub, right }: {
 
 /* ──────────────────────────── trigger mode ───────────────────────────────── */
 
+/** Labels/blurbs for TRIGGER_MODES are hardcoded here rather than translated in
+ *  shared/triggers.ts: that module is imported by main too, which has no t(). */
+const MODE_LABEL_KEY: Record<TriggerMode, string> = {
+  strict: 'triggersUi.mode.strictLabel',
+  'allow-all': 'triggersUi.mode.allowAllLabel',
+  'communication-only': 'triggersUi.mode.commOnlyLabel'
+};
+const MODE_BLURB_KEY: Record<TriggerMode, string> = {
+  strict: 'triggersUi.mode.strictBlurb',
+  'allow-all': 'triggersUi.mode.allowAllBlurb',
+  'communication-only': 'triggersUi.mode.commOnlyBlurb'
+};
+
+/** Shared with WebhookRow/OrgSection so a mode chip never shows raw English
+ *  while the picker shows French. */
+export function modeLabel(t: (key: string, en: string, params?: Record<string, string | number>) => string, mode: TriggerMode): string {
+  const m = TRIGGER_MODES.find((x) => x.value === mode) ?? TRIGGER_MODES[0];
+  return t(MODE_LABEL_KEY[m.value], m.label);
+}
+
 /** The shared `strict / allow-all / communication-only` gate. Labels and blurbs
  *  come from `TRIGGER_MODES` so webhooks and org can never drift apart. */
 export function ModePicker({ value, onChange }: { value: TriggerMode; onChange: (m: TriggerMode) => void }) {
+  const t = useT();
   const current = TRIGGER_MODES.find((m) => m.value === value) ?? TRIGGER_MODES[0];
   return (
     <>
       <Select value={value} onChange={(v) => onChange(v as TriggerMode)} style={{ width: '100%' }}>
-        {TRIGGER_MODES.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+        {TRIGGER_MODES.map((m) => <option key={m.value} value={m.value}>{t(MODE_LABEL_KEY[m.value], m.label)}</option>)}
       </Select>
-      <Hint>{current.blurb}</Hint>
+      <Hint>{t(MODE_BLURB_KEY[current.value], current.blurb)}</Hint>
     </>
   );
 }
@@ -269,13 +292,13 @@ export const INTERVAL_OPTS: { ms: number; label: string }[] = [
  *  persist now, so the label is computed rather than looked up — a select that
  *  falls back to the nearest preset would quietly lie about the stored value. */
 export function fmtInterval(ms: number): string {
-  if (!Number.isFinite(ms) || ms <= 0) return 'off';
-  if (ms === WEEK) return 'weekly';
-  if (ms % WEEK === 0) return `${ms / WEEK}w`;
-  if (ms % DAY === 0) return `${ms / DAY}d`;
-  if (ms % HOUR === 0) return `${ms / HOUR}h`;
-  if (ms % MINUTE === 0) return `${ms / MINUTE}m`;
-  return `${Math.round(ms / 1000)}s`;
+  if (!Number.isFinite(ms) || ms <= 0) return translate('triggersUi.off', 'off');
+  if (ms === WEEK) return translate('triggersUi.weekly', 'weekly');
+  if (ms % WEEK === 0) return `${ms / WEEK}` + translate('triggersUi.unit.w', 'w');
+  if (ms % DAY === 0) return `${ms / DAY}` + translate('triggersUi.unit.d', 'd');
+  if (ms % HOUR === 0) return `${ms / HOUR}` + translate('triggersUi.unit.h', 'h');
+  if (ms % MINUTE === 0) return `${ms / MINUTE}` + translate('triggersUi.unit.m', 'm');
+  return `${Math.round(ms / 1000)}` + translate('triggersUi.unit.s', 's');
 }
 
 const CUSTOM = '__custom';
@@ -289,6 +312,7 @@ const CUSTOM = '__custom';
 export function IntervalPicker({ value, onChange, minMs = MINUTE, maxMs = Number.POSITIVE_INFINITY }: {
   value: number; onChange: (ms: number) => void; minMs?: number; maxMs?: number;
 }) {
+  const t = useT();
   const opts = INTERVAL_OPTS.filter((o) => o.ms >= minMs && o.ms <= maxMs);
   const preset = opts.some((o) => o.ms === value);
   const [custom, setCustom] = useState(!preset);
@@ -304,9 +328,9 @@ export function IntervalPicker({ value, onChange, minMs = MINUTE, maxMs = Number
           onChange(Number(v));
         }}
       >
-        {!preset && <option value={CUSTOM}>{fmtInterval(value)} (custom)</option>}
-        {opts.map((o) => <option key={o.ms} value={String(o.ms)}>{o.label}</option>)}
-        {preset && <option value={CUSTOM}>custom…</option>}
+        {!preset && <option value={CUSTOM}>{t('triggersUi.customValue', '{value} (custom)', { value: fmtInterval(value) })}</option>}
+        {opts.map((o) => <option key={o.ms} value={String(o.ms)}>{fmtInterval(o.ms)}</option>)}
+        {preset && <option value={CUSTOM}>{t('triggersUi.customEllipsis', 'custom…')}</option>}
       </Select>
       {showCustom && (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -321,7 +345,7 @@ export function IntervalPicker({ value, onChange, minMs = MINUTE, maxMs = Number
             }}
             style={{ ...monoInputStyle, width: 68, padding: '3px 5px' }}
           />
-          <span style={{ fontSize: 11, color: 'var(--cth-ink-500)' }}>min</span>
+          <span style={{ fontSize: 11, color: 'var(--cth-ink-500)' }}>{t('triggersUi.min', 'min')}</span>
         </span>
       )}
     </div>
@@ -370,6 +394,7 @@ export function SecretField({ value, revealed, onReveal, onCopy, copied, placeho
   onChange?: (v: string) => void;
   onBlur?: () => void;
 }) {
+  const t = useT();
   const readOnly = !onChange;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -382,8 +407,8 @@ export function SecretField({ value, revealed, onReveal, onCopy, copied, placeho
         onBlur={onBlur}
         style={{ ...monoInputStyle, flex: 1, minWidth: 0, padding: '4px 6px' }}
       />
-      <MiniButton onClick={onReveal}>{revealed ? 'hide' : 'show'}</MiniButton>
-      {onCopy && <MiniButton onClick={onCopy} tone={copied ? 'good' : 'plain'}>{copied ? 'copied' : 'copy'}</MiniButton>}
+      <MiniButton onClick={onReveal}>{revealed ? t('triggersUi.hide', 'hide') : t('triggersUi.show', 'show')}</MiniButton>
+      {onCopy && <MiniButton onClick={onCopy} tone={copied ? 'good' : 'plain'}>{copied ? t('triggersUi.copied', 'copied') : t('triggersUi.copy', 'copy')}</MiniButton>}
     </div>
   );
 }

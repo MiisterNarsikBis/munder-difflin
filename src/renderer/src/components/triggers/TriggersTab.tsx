@@ -4,6 +4,7 @@ import { ContextSection } from './ContextSection';
 import { WebhooksSection } from './WebhooksSection';
 import { OrgSection } from './OrgSection';
 import { Muted, Scroll, TriggerCard } from './ui';
+import { useT } from '@/i18n';
 
 /**
  * TRIGGERS — every way the floor gets woken up without a human typing, in one
@@ -17,6 +18,7 @@ import { Muted, Scroll, TriggerCard } from './ui';
  * way, so nothing is more than two disclosures from legible.
  */
 export function TriggersTab() {
+  const t = useT();
   const [schedulesSummary, setSchedulesSummary] = useState('');
   const [contextSummary, setContextSummary] = useState('');
   const [webhooksSummary, setWebhooksSummary] = useState('');
@@ -24,12 +26,12 @@ export function TriggersTab() {
 
   return (
     <Scroll>
-      <Muted>Everything that can start work without you typing.</Muted>
+      <Muted>{t('triggersTab.blurb', 'Everything that can start work without you typing.')}</Muted>
       <div style={{ height: 8 }} />
 
       <TriggerCard
-        title="SCHEDULES"
-        blurb="Run a prompt on a repeating clock."
+        title={t('triggersTab.schedules.title', 'SCHEDULES')}
+        blurb={t('triggersTab.schedules.blurb', 'Run a prompt on a repeating clock.')}
         summary={schedulesSummary}
         defaultOpen
       >
@@ -37,24 +39,24 @@ export function TriggersTab() {
       </TriggerCard>
 
       <TriggerCard
-        title="CONTEXT"
-        blurb="Compact or clear an agent as its context fills."
+        title={t('triggersTab.context.title', 'CONTEXT')}
+        blurb={t('triggersTab.context.blurb', 'Compact or clear an agent as its context fills.')}
         summary={contextSummary}
       >
         <ContextSection onSummary={setContextSummary} />
       </TriggerCard>
 
       <TriggerCard
-        title="WEBHOOKS"
-        blurb="Let an outside system post work in."
+        title={t('triggersTab.webhooks.title', 'WEBHOOKS')}
+        blurb={t('triggersTab.webhooks.blurb', 'Let an outside system post work in.')}
         summary={webhooksSummary}
       >
         <WebhooksSection onSummary={setWebhooksSummary} />
       </TriggerCard>
 
       <TriggerCard
-        title="ORGANISATION"
-        blurb="Let a teammate's Munder Difflin message yours."
+        title={t('triggersTab.organisation.title', 'ORGANISATION')}
+        blurb={t('triggersTab.organisation.blurb', "Let a teammate's Munder Difflin message yours.")}
         summary={orgSummary}
       >
         <OrgSection onSummary={setOrgSummary} />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { PixelButton } from '../PixelButton';
 import type { TriggerHistoryEntry } from '@shared/triggers';
+import { useT, t as translate } from '@/i18n';
 
 /**
  * TRIGGER HISTORY — the ledger of everything an outside party said to this hive
@@ -106,10 +107,12 @@ function buildExchanges(rows: TriggerHistoryEntry[]): Exchange[] {
 function relTime(ms: number): string {
   const past = ms >= 0;
   const a = Math.abs(ms);
-  if (a < 45_000) return 'just now';
+  if (a < 45_000) return translate('triggerHistoryTab.justNow', 'just now');
   const mins = Math.round(a / 60_000);
-  const unit = mins < 60 ? `${mins}m` : mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
-  return past ? `${unit} ago` : `in ${unit}`;
+  const unit = mins < 60 ? `${mins}` + translate('triggerHistoryTab.unit.m', 'm')
+    : mins < 1440 ? `${Math.round(mins / 60)}` + translate('triggerHistoryTab.unit.h', 'h')
+    : `${Math.round(mins / 1440)}` + translate('triggerHistoryTab.unit.d', 'd');
+  return past ? translate('triggerHistoryTab.unitAgo', '{unit} ago', { unit }) : translate('triggerHistoryTab.inUnit', 'in {unit}', { unit });
 }
 
 const CLAMP_CHARS = 320;
@@ -174,21 +177,23 @@ function Badge({ fill, line, children }: { fill: string; line: string; children:
 }
 
 function KindBadge({ kind }: { kind: TriggerHistoryEntry['kind'] }) {
+  const t = useT();
   return kind === 'directive'
-    ? <Badge fill="var(--cth-lemon-light)" line="var(--cth-lemon)">directive</Badge>
-    : <Badge fill="var(--cth-sky-light)" line="var(--cth-sky)">communication</Badge>;
+    ? <Badge fill="var(--cth-lemon-light)" line="var(--cth-lemon)">{t('triggerHistoryTab.directive', 'directive')}</Badge>
+    : <Badge fill="var(--cth-sky-light)" line="var(--cth-sky)">{t('triggerHistoryTab.communication', 'communication')}</Badge>;
 }
 
 function DecisionBadge({ decision }: { decision: NonNullable<TriggerHistoryEntry['decision']> }) {
+  const t = useT();
   switch (decision) {
     case 'pending':
-      return <Badge fill="var(--cth-lemon-light)" line="var(--cth-lemon)">needs you</Badge>;
+      return <Badge fill="var(--cth-lemon-light)" line="var(--cth-lemon)">{t('triggerHistoryTab.needsYou', 'needs you')}</Badge>;
     case 'approved':
-      return <Badge fill="var(--cth-mint-light)" line="var(--cth-mint)">approved</Badge>;
+      return <Badge fill="var(--cth-mint-light)" line="var(--cth-mint)">{t('triggerHistoryTab.approved', 'approved')}</Badge>;
     case 'rejected':
-      return <Badge fill="var(--cth-coral-light)" line="var(--cth-coral)">rejected</Badge>;
+      return <Badge fill="var(--cth-coral-light)" line="var(--cth-coral)">{t('triggerHistoryTab.rejected', 'rejected')}</Badge>;
     default:
-      return <Badge fill="var(--cth-cream-200)" line="var(--cth-ink-300)">auto-allowed</Badge>;
+      return <Badge fill="var(--cth-cream-200)" line="var(--cth-ink-300)">{t('triggerHistoryTab.autoAllowed', 'auto-allowed')}</Badge>;
   }
 }
 
@@ -205,6 +210,7 @@ function MessageBlock({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
   const body = msg.body ?? '';
   const { text, clipped } = useMemo(() => clampBody(body), [body]);
   return (
@@ -213,10 +219,10 @@ function MessageBlock({
         <span style={tinyCaps}>{label}</span>
         <span style={{ ...tinyCaps, flexShrink: 0 }}>{relTime(Date.now() - msg.at)}</span>
       </div>
-      <div style={bodyBox}>{body.trim() ? (expanded ? body : text) : '(empty message)'}</div>
+      <div style={bodyBox}>{body.trim() ? (expanded ? body : text) : t('triggerHistoryTab.emptyMessage', '(empty message)')}</div>
       {clipped && (
         <button type="button" onClick={onToggle} style={linkButton}>
-          {expanded ? 'show less' : `show all ${body.length} characters`}
+          {expanded ? t('triggerHistoryTab.showLess', 'show less') : t('triggerHistoryTab.showAllChars', 'show all {n} characters', { n: body.length })}
         </button>
       )}
     </div>
@@ -238,6 +244,7 @@ function ExchangeCard({
   busy: Record<string, boolean>;
   onDecide: (id: string, decision: 'approved' | 'rejected') => void;
 }) {
+  const t = useT();
   const head = ex.head;
   const hasInbound = ex.msgs.some((m) => m.direction === 'inbound');
   const decision = head.decision;
@@ -248,8 +255,8 @@ function ExchangeCard({
   // is normal — it is a message still in flight, never a failure.
   const tail = (() => {
     if (pending || ex.answered) return null;
-    if (decision === 'rejected') return 'You turned this down. Nothing was sent to the hive.';
-    return 'No reply yet. Michael has this one.';
+    if (decision === 'rejected') return t('triggerHistoryTab.tailRejected', 'You turned this down. Nothing was sent to the hive.');
+    return t('triggerHistoryTab.tailNoReply', 'No reply yet. Michael has this one.');
   })();
 
   return (
@@ -259,19 +266,19 @@ function ExchangeCard({
           background: 'var(--cth-lemon-light)', boxShadow: 'inset 0 0 0 1px var(--cth-lemon)',
           padding: '4px 6px 3px', ...tinyCaps, color: 'var(--cth-ink-900)'
         }}>
-          WAITING FOR YOU
+          {t('triggerHistoryTab.waitingForYou', 'WAITING FOR YOU')}
         </div>
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'space-between' }}>
           <span style={{ ...uiText, ...ellipsis, minWidth: 0 }} title={head.sourceName}>
-            {head.sourceName || 'unnamed source'}
+            {head.sourceName || t('triggerHistoryTab.unnamedSource', 'unnamed source')}
           </span>
           <span style={{ ...tinyCaps, flexShrink: 0 }}>{relTime(Date.now() - ex.latestAt)}</span>
         </div>
         <div style={{ ...muted, ...ellipsis, fontSize: 11 }} title={head.peer}>
-          {hasInbound ? 'from' : 'to'} {head.peer || 'unknown'}
+          {hasInbound ? t('triggerHistoryTab.from', 'from') : t('triggerHistoryTab.to', 'to')} {head.peer || t('triggerHistoryTab.unknown', 'unknown')}
         </div>
         {head.title && (
           <div style={{ ...uiText, ...ellipsis, color: 'var(--cth-ink-700)' }} title={head.title}>
@@ -289,7 +296,7 @@ function ExchangeCard({
         <MessageBlock
           key={m.id}
           msg={m}
-          label={m.direction === 'inbound' ? 'THEY SENT' : hasInbound ? 'WE REPLIED' : 'WE SENT'}
+          label={m.direction === 'inbound' ? t('triggerHistoryTab.theySent', 'THEY SENT') : hasInbound ? t('triggerHistoryTab.weReplied', 'WE REPLIED') : t('triggerHistoryTab.weSent', 'WE SENT')}
           expanded={!!expanded[m.id]}
           onToggle={() => toggle(m.id)}
         />
@@ -299,8 +306,8 @@ function ExchangeCard({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ ...uiText, fontSize: 11, lineHeight: '16px', color: 'var(--cth-ink-700)' }}>
             {pending.kind === 'directive'
-              ? 'Approve and this goes to Michael, who will put the hive to work on it. Reject and it is dropped — nothing runs.'
-              : 'Approve and Michael reads this. Reject and it is dropped — nothing runs.'}
+              ? t('triggerHistoryTab.approveDirective', 'Approve and this goes to Michael, who will put the hive to work on it. Reject and it is dropped — nothing runs.')
+              : t('triggerHistoryTab.approveCommunication', 'Approve and Michael reads this. Reject and it is dropped — nothing runs.')}
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <PixelButton
@@ -308,18 +315,18 @@ function ExchangeCard({
               size="sm"
               disabled={!!busy[pending.id]}
               onClick={() => onDecide(pending.id, 'approved')}
-              title="Send this message through to Michael"
+              title={t('triggerHistoryTab.sendThroughToMichael', 'Send this message through to Michael')}
             >
-              {busy[pending.id] ? 'one sec…' : 'approve'}
+              {busy[pending.id] ? t('triggerHistoryTab.oneSecEllipsis', 'one sec…') : t('triggerHistoryTab.approve', 'approve')}
             </PixelButton>
             <PixelButton
               variant="secondary"
               size="sm"
               disabled={!!busy[pending.id]}
               onClick={() => onDecide(pending.id, 'rejected')}
-              title="Drop this message. Nothing is sent"
+              title={t('triggerHistoryTab.dropNothingSent', 'Drop this message. Nothing is sent')}
             >
-              reject
+              {t('triggerHistoryTab.reject', 'reject')}
             </PixelButton>
           </div>
         </div>
@@ -328,7 +335,7 @@ function ExchangeCard({
       {tail && <div style={{ ...muted, fontSize: 11 }}>{tail}</div>}
 
       {taskId && (
-        <div style={{ ...tinyCaps, ...ellipsis }} title={taskId}>TASK {taskId}</div>
+        <div style={{ ...tinyCaps, ...ellipsis }} title={taskId}>{t('triggerHistoryTab.task', 'TASK {id}', { id: taskId })}</div>
       )}
     </div>
   );
@@ -345,22 +352,23 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-const SECTIONS: { key: Source; label: string; blurb: string }[] = [
+const SECTIONS: { key: Source; labelKey: string; labelEn: string; blurbKey: string; blurbEn: string }[] = [
   {
     key: 'webhook',
-    label: 'Webhooks',
-    blurb: 'Everything posted to your webhook endpoints, next to what Michael sent back.'
+    labelKey: 'triggerHistoryTab.section.webhooksLabel', labelEn: 'Webhooks',
+    blurbKey: 'triggerHistoryTab.section.webhooksBlurb', blurbEn: 'Everything posted to your webhook endpoints, next to what Michael sent back.'
   },
   {
     key: 'org',
-    label: 'Organization',
-    blurb: 'Messages from your teammates’ clone nodes, next to what Michael sent back.'
+    labelKey: 'triggerHistoryTab.section.organizationLabel', labelEn: 'Organization',
+    blurbKey: 'triggerHistoryTab.section.organizationBlurb', blurbEn: 'Messages from your teammates’ clone nodes, next to what Michael sent back.'
   }
 ];
 
 /* ──────────────────────────────── the tab ────────────────────────────────── */
 
 export function TriggerHistoryTab() {
+  const t = useT();
   const [entries, setEntries] = useState<TriggerHistoryEntry[]>([]);
   const [source, setSource] = useState<Source>('webhook');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -398,21 +406,21 @@ export function TriggerHistoryTab() {
     call({ id, decision })
       .then((res) => {
         if (res && res.ok === false) {
-          setError(res.error || 'That did not go through. Try again.');
+          setError(res.error || t('triggerHistoryTab.didNotGoThrough', 'That did not go through. Try again.'));
           load();
         }
       })
-      .catch(() => { setError('That did not go through. Try again.'); load(); })
+      .catch(() => { setError(t('triggerHistoryTab.didNotGoThrough', 'That did not go through. Try again.')); load(); })
       .finally(() => setBusy((b) => { const n = { ...b }; delete n[id]; return n; }));
-  }, [load]);
+  }, [load, t]);
 
   const clear = useCallback(() => {
     const call = api().clearTriggerHistory;
     setConfirmClear(false);
     if (!call) return;
     setEntries((rows) => rows.filter((r) => r.source !== source));
-    call(source).catch(() => { setError('Could not clear it. Try again.'); load(); });
-  }, [source, load]);
+    call(source).catch(() => { setError(t('triggerHistoryTab.couldNotClear', 'Could not clear it. Try again.')); load(); });
+  }, [source, load, t]);
 
   const counts = useMemo(() => {
     const c: Record<Source, { total: number; pending: number }> = {
@@ -464,7 +472,7 @@ export function TriggerHistoryTab() {
                 minWidth: 0
               }}
             >
-              <span style={ellipsis}>{s.label.toUpperCase()}</span>
+              <span style={ellipsis}>{t(s.labelKey, s.labelEn).toUpperCase()}</span>
               {p > 0 && (
                 <span style={{
                   ...badgeStyle('var(--cth-lemon-light)', 'var(--cth-lemon)'),
@@ -480,7 +488,7 @@ export function TriggerHistoryTab() {
         flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden',
         padding: 8, display: 'flex', flexDirection: 'column', gap: 8
       }}>
-        <div style={{ ...muted, fontSize: 11, lineHeight: '16px' }}>{section.blurb}</div>
+        <div style={{ ...muted, fontSize: 11, lineHeight: '16px' }}>{t(section.blurbKey, section.blurbEn)}</div>
 
         {pendingCount > 0 && (
           <div style={{
@@ -488,8 +496,8 @@ export function TriggerHistoryTab() {
             padding: '6px 8px', ...uiText, fontSize: 11, lineHeight: '16px'
           }}>
             {pendingCount === 1
-              ? 'One message is held, waiting on your yes or no.'
-              : `${pendingCount} messages are held, waiting on your yes or no.`}
+              ? t('triggerHistoryTab.oneMessageHeld', 'One message is held, waiting on your yes or no.')
+              : t('triggerHistoryTab.nMessagesHeld', '{n} messages are held, waiting on your yes or no.', { n: pendingCount })}
           </div>
         )}
 
@@ -503,17 +511,13 @@ export function TriggerHistoryTab() {
         {exchanges.length === 0 ? (
           source === 'org' ? (
             <EmptyState
-              title="Nothing here yet, and nothing is broken."
-              body={'Teammate messaging is not built yet. You can set an org key and pick a mode '
-                + 'today, but no one’s clone node can reach yours until the transport ships. '
-                + 'When it does, their messages and our replies land here.'}
+              title={t('triggerHistoryTab.orgEmptyTitle', 'Nothing here yet, and nothing is broken.')}
+              body={t('triggerHistoryTab.orgEmptyBody', 'Teammate messaging is not built yet. You can set an org key and pick a mode today, but no one’s clone node can reach yours until the transport ships. When it does, their messages and our replies land here.')}
             />
           ) : (
             <EmptyState
-              title="No webhook messages yet."
-              body={'When something posts to one of your endpoints, it lands here with Michael’s '
-                + 'reply underneath. Nothing has called in so far. Add an endpoint under Webhooks to '
-                + 'get a URL you can hand out.'}
+              title={t('triggerHistoryTab.webhookEmptyTitle', 'No webhook messages yet.')}
+              body={t('triggerHistoryTab.webhookEmptyBody', 'When something posts to one of your endpoints, it lands here with Michael’s reply underneath. Nothing has called in so far. Add an endpoint under Webhooks to get a URL you can hand out.')}
             />
           )
         ) : (
@@ -534,13 +538,12 @@ export function TriggerHistoryTab() {
             {confirmClear ? (
               <>
                 <div style={{ ...muted, fontSize: 11, lineHeight: '16px' }}>
-                  Delete all {counts[source].total} {section.label.toLowerCase()} messages? The record
-                  is gone for good.
+                  {t('triggerHistoryTab.deleteAllConfirm', 'Delete all {n} {section} messages? The record is gone for good.', { n: counts[source].total, section: t(section.labelKey, section.labelEn).toLowerCase() })}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <PixelButton variant="destructive" size="sm" onClick={clear}>delete them</PixelButton>
+                  <PixelButton variant="destructive" size="sm" onClick={clear}>{t('triggerHistoryTab.deleteThem', 'delete them')}</PixelButton>
                   <PixelButton variant="ghost" size="sm" onClick={() => setConfirmClear(false)}>
-                    keep them
+                    {t('triggerHistoryTab.keepThem', 'keep them')}
                   </PixelButton>
                 </div>
               </>
@@ -550,9 +553,9 @@ export function TriggerHistoryTab() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setConfirmClear(true)}
-                  title="Delete this section’s history"
+                  title={t('triggerHistoryTab.deleteSectionHistory', 'Delete this section’s history')}
                 >
-                  clear history
+                  {t('triggerHistoryTab.clearHistory', 'clear history')}
                 </PixelButton>
               </div>
             )}
