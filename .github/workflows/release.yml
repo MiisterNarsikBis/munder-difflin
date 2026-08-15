@@ -76,6 +76,13 @@ jobs:
           APPLE_ID: ${{ matrix.os == 'macos-latest' && secrets.APPLE_ID || '' }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ matrix.os == 'macos-latest' && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
           APPLE_TEAM_ID: ${{ matrix.os == 'macos-latest' && secrets.APPLE_TEAM_ID || '' }}
+          # macOS-only quirk: electron-builder's CSC_IDENTITY_AUTO_DISCOVERY (default
+          # true) still probes the runner's default keychain and mishandles an empty
+          # (but DEFINED) CSC_LINK — it resolves '' as a relative path, which is the repo
+          # checkout dir, and fails with "<repo> not a file" instead of skipping signing
+          # like Windows does. Force auto-discovery off when there's no real cert secret;
+          # leave it at its default (on) when APPLE_CERTIFICATE_P12 is actually set.
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.os == 'macos-latest' && secrets.APPLE_CERTIFICATE_P12 == '' && 'false' || '' }}
 
       - name: Generate checksums
         shell: bash
