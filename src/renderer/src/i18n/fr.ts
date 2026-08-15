@@ -1382,5 +1382,8 @@ export const FR: Record<string, string> = {
   'addAgentModal.castBlurb.ryan': 'Le stagiaire',
   'addAgentModal.castBlurb.toby': 'Ressources humaines',
   'addAgentModal.castBlurb.creed': 'Assurance qualité',
-  'addAgentModal.castBlurb.meredith': 'Relations fournisseurs'
+  'addAgentModal.castBlurb.meredith': 'Relations fournisseurs',
+
+  // ── scene/office/OfficeFloor.tsx ──────────────────────────────────────────
+  'officeFloor.glContextLost': 'Le plateau de bureau a perdu son contexte GPU.\n\nTrop de terminaux utilisent le GPU en même temps.\nFermez quelques terminaux d’agents, ou redémarrez l’application, pour le rétablir.'
 };

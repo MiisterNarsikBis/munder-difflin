@@ -14,6 +14,7 @@ import { colors } from '@/design/tokens';
 import { loadTheme, resolveThemeMap, themeTilesetUrls } from './themeLoader';
 import { installContextLossRecovery } from './glRecovery';
 import type { Tile, Facing, ErrandKind, ErrandSpot } from './themeRegistry';
+import { useT } from '@/i18n';
 
 // The map, tileset atlases, desk-claim order, errand spots, coffee-economy
 // tiles, prop anchors, monitor gids and palette all come from the active
@@ -157,6 +158,11 @@ function firstWords(prompt: string | undefined, maxWords = 6, maxChars = 42): st
 }
 
 export function OfficeFloor() {
+  const t = useT();
+  const glLostMessage = t(
+    'officeFloor.glContextLost',
+    'The office floor lost its GPU context.\n\nToo many terminals are using the GPU at once.\nClose a few agent terminals, or restart the app, to bring it back.'
+  );
   const hostRef = useRef<HTMLDivElement | null>(null);
   const appRef = useRef<Application | null>(null);
   const mountIdRef = useRef(0);
@@ -219,10 +225,7 @@ export function OfficeFloor() {
           note.style.cssText =
             'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
             'padding:24px;color:#ffd0b5;font-family:monospace;font-size:13px;text-align:center;white-space:pre-wrap;';
-          note.textContent =
-            'The office floor lost its GPU context.\n\n' +
-            'Too many terminals are using the GPU at once.\n' +
-            'Close a few agent terminals, or restart the app, to bring it back.';
+          note.textContent = glLostMessage;
           host.appendChild(note);
         }
       });
