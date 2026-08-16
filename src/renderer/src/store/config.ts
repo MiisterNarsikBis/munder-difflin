@@ -69,6 +69,9 @@ export interface HarnessConfig {
    *  'claude' / 'claude-opus-4-8'. Mirrors src/main/config.ts. */
   godProvider?: AgentProvider;
   godModel?: string;
+  /** Auto-run `/remote-control` on Michael every boot so permission prompts can be
+   *  approved from claude.ai / mobile. Default OFF. Mirrors src/main/config.ts. */
+  remoteControlAtStartup?: boolean;
   /** Per-server consent for the default MCP bundle, keyed by catalog id (mirrors
    *  src/main/config.ts; seeded from MCP_CATALOG). */
   mcpDefaults?: { [id: string]: { enabled: boolean } };

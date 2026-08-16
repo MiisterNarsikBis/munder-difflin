@@ -189,6 +189,7 @@ export function SettingsModal({ config, onClose, initialSection }: SettingsModal
   const cfgX = config as HarnessConfig & {
     strongKeepalive?: boolean; audience?: string; autoMode?: boolean;
     defaultModel?: string; maxTurns?: number; semanticMemory?: boolean;
+    remoteControlAtStartup?: boolean;
   };
   const [keepAwake, setKeepAwake] = useState<boolean>(cfgX.strongKeepalive === true);
   const toggleKeepAwake = async () => {
@@ -196,6 +197,15 @@ export function SettingsModal({ config, onClose, initialSection }: SettingsModal
     setKeepAwake(next);
     try { await window.cth.updateConfig({ strongKeepalive: next } as Partial<HarnessConfig>); }
     catch { setKeepAwake(!next); }
+  };
+  const [remoteControlAtStartup, setRemoteControlAtStartup] = useState<boolean>(
+    cfgX.remoteControlAtStartup === true
+  );
+  const toggleRemoteControlAtStartup = async () => {
+    const next = !remoteControlAtStartup;
+    setRemoteControlAtStartup(next);
+    try { await window.cth.updateConfig({ remoteControlAtStartup: next } as Partial<HarnessConfig>); }
+    catch { setRemoteControlAtStartup(!next); }
   };
   const [simpleMode, setSimpleMode] = useState<boolean>(cfgX.audience === 'non-technical');
   const toggleSimpleMode = async () => {
@@ -932,6 +942,17 @@ export function SettingsModal({ config, onClose, initialSection }: SettingsModal
                             </div>
                             <PixelButton variant={simpleMode ? 'primary' : 'secondary'} size="sm" onClick={toggleSimpleMode}>
                               {simpleMode ? t('common.on', 'on') : t('common.off', 'off')}
+                            </PixelButton>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <span style={{ fontSize: 13, lineHeight: '20px', color: 'var(--cth-ink-900)' }}>{t('settingsModal.general.remoteControlAtStartup.label', 'Enable Remote Control on launch')}</span>
+                              <span style={{ fontSize: 12, lineHeight: '16px', color: 'var(--cth-ink-500)' }}>
+                                {t('settingsModal.general.remoteControlAtStartup.blurb', "Lets you approve Michael's permission prompts from claude.ai / the mobile app. Off by default.")}
+                              </span>
+                            </div>
+                            <PixelButton variant={remoteControlAtStartup ? 'primary' : 'secondary'} size="sm" onClick={toggleRemoteControlAtStartup}>
+                              {remoteControlAtStartup ? t('common.on', 'on') : t('common.off', 'off')}
                             </PixelButton>
                           </div>
                         </div>

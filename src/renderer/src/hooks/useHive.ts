@@ -354,9 +354,12 @@ export function useHive(config: HarnessConfig | null): void {
       useStore.getState().addAgent(god);
       useStore.getState().setGodStatus('ready');
 
-      // Kick Michael off once his TUI is up. Always re-enable remote control so
-      // the human can approve permission prompts from their phone (best-effort — a
-      // failed/unknown slash command just prints to his terminal and is harmless).
+      // Kick Michael off once his TUI is up. Re-enable remote control so the
+      // human can approve permission prompts from their phone (best-effort — a
+      // failed/unknown slash command just prints to his terminal and is harmless)
+      // — but ONLY when the user opted in via config.remoteControlAtStartup
+      // (Settings → General; default OFF, so Remote Control stays off unless
+      // explicitly enabled).
       // Then, ONLY on a genuinely fresh spawn, hand him the orientation prompt —
       // a RESUMED Michael already has his full context and must not be re-oriented
       // mid-thread (that would reset the floor's situational awareness). Both go
@@ -367,7 +370,9 @@ export function useHive(config: HarnessConfig | null): void {
       bootGraceUntil.current[GOD_ID] = Date.now() + BOOT_GRACE_MS;
       void (async () => {
         try {
-          const remoteCommand = remoteControlCommandForProvider(godProvider, 'Michael');
+          const remoteCommand = config.remoteControlAtStartup
+            ? remoteControlCommandForProvider(godProvider, 'Michael')
+            : null;
           if (remoteCommand) {
             // settleMs pauses the chain ~1.5s after /remote-control before the
             // orientation prompt (fresh spawns only) is submitted next.

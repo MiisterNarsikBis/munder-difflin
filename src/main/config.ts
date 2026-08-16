@@ -191,6 +191,11 @@ export interface HarnessConfig {
    *  constant; only its engine is selectable. Default 'claude'. Eligible providers
    *  are those that can receive inbox (claude/codex/antigravity/qwen). */
   godProvider?: AgentProvider;
+  /** Auto-run `/remote-control` on Michael every time he boots (fresh spawn or
+   *  resumed), so the human can approve permission prompts from claude.ai / the
+   *  mobile app without asking each time. Default OFF — Remote Control stays off
+   *  until the user opts in from Settings → General. */
+  remoteControlAtStartup?: boolean;
   /** The model GOD runs on. Unset falls back to the provider preset's
    *  `recommendedOrchestratorModel`, then MODEL_GOD. Default 'claude-opus-4-8'. */
   godModel?: string;
@@ -412,6 +417,7 @@ const DEFAULTS: HarnessConfig = {
   autoMode: true,
   defaultCommand: 'claude',
   godProvider: 'claude',
+  remoteControlAtStartup: false,
   godModel: 'claude-opus-4-8',
   // Global default model for every agent that hasn't picked one explicitly — wins
   // over the role-based tiers (modelForRole) in the spawn handler, so all agents

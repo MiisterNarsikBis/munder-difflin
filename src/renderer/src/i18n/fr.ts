@@ -119,6 +119,8 @@ export const FR: Record<string, string> = {
   'settingsModal.general.keepAwake.blurb': 'Empêche la mise en veille de l’écran pour que les plannings et les terminaux continuent de se déclencher à l’heure. Consomme de la batterie — mieux sur secteur.',
   'settingsModal.general.simpleMode.label': 'Expliquer simplement',
   'settingsModal.general.simpleMode.blurb': "Les agents vous informent en langage clair plutôt qu'en jargon technique.",
+  'settingsModal.general.remoteControlAtStartup.label': 'Activer le Remote Control au lancement',
+  'settingsModal.general.remoteControlAtStartup.blurb': "Permet d'approuver les demandes de permission de Michael depuis claude.ai / l'app mobile. Désactivé par défaut.",
   'settingsModal.general.notifications': 'Notifications',
   'settingsModal.general.desktopNotifications.label': 'Notifications bureau',
   'settingsModal.general.desktopNotifications.blurb': "Notifications natives quand un agent termine ou a besoin de votre avis.",
