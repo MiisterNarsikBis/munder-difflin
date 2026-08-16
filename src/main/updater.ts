@@ -43,7 +43,7 @@ import { reduceStatus, clampPercent, isNewer, type UpdateStatus } from '../share
  *      downgrade is per-check, not a permanent latch.
  */
 
-const REPO = 'chaitanyagiri/munder-difflin';
+const REPO = 'MiisterNarsikBis/munder-difflin';
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6h
 const FALLBACK_CACHE_MS = 60 * 60 * 1000;     // 1h between releases/latest polls
 
