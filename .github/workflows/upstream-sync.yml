@@ -1,0 +1,106 @@
+name: Upstream Sync
+
+# Weekly check for new commits on chaitanyagiri/munder-difflin's `main` (the
+# project this repo is forked from) and open a PR here with a plain `git merge`
+# of them, so upstream's fixes/features get pulled forward with human review
+# instead of this fork silently drifting away.
+#
+# Files this fork has diverged on (electron-builder.yml publish owner,
+# src/main/updater.ts's REPO constant, package.json, RELEASE.md, README
+# language default, i18n/fr.ts, ...) WILL conflict from time to time — that is
+# expected, not a bug in this workflow. When `git merge` reports conflicts, the
+# merge commit is still pushed with the raw conflict markers baked into the
+# files, and the PR body says so; resolve them by editing the `upstream-sync`
+# branch (locally or via the GitHub UI) and pushing a normal commit — that push
+# runs CI as usual, unlike this workflow's own bot-authored commits (GitHub
+# does not trigger `pull_request`-driven runs for commits made with the
+# default GITHUB_TOKEN, to prevent workflow recursion).
+on:
+  schedule:
+    - cron: '0 6 * * 1' # every Monday 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # One sync PR at a time: if the last one is still open (conflicts not yet
+      # resolved, or just not reviewed), resetting `upstream-sync` from main and
+      # re-merging would blow away any manual conflict resolution already pushed
+      # to it. Wait for it to be merged or closed instead.
+      - name: Check for an already-open sync PR
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          count=$(gh pr list --head upstream-sync --state open --json number --jq 'length')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          if [ "$count" != "0" ]; then
+            echo "An upstream-sync PR is already open — skipping this run."
+          fi
+
+      - name: Fetch upstream
+        if: steps.existing.outputs.count == '0'
+        run: |
+          git remote add upstream https://github.com/chaitanyagiri/munder-difflin.git
+          git fetch upstream main
+
+      - name: Check for new upstream commits
+        if: steps.existing.outputs.count == '0'
+        id: diff
+        run: |
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+            echo "Already up to date with upstream/main."
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge upstream/main into a sync branch
+        if: steps.existing.outputs.count == '0' && steps.diff.outputs.new == 'true'
+        id: merge
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -B upstream-sync origin/main
+          if git merge upstream/main --no-edit; then
+            echo "conflicts=false" >> "$GITHUB_OUTPUT"
+          else
+            git diff --name-only --diff-filter=U | sed 's/^/- `/; s/$/`/' > /tmp/conflicts.md
+            git add -A
+            git commit --no-edit
+            echo "conflicts=true" >> "$GITHUB_OUTPUT"
+          fi
+          git push origin upstream-sync --force
+
+      - name: Open pull request
+        if: steps.existing.outputs.count == '0' && steps.diff.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.merge.outputs.conflicts }}" = "true" ]; then
+            {
+              echo "Auto-generated sync from [chaitanyagiri/munder-difflin](https://github.com/chaitanyagiri/munder-difflin)'s \`main\`."
+              echo
+              echo "**⚠️ This merge has conflicts** in:"
+              cat /tmp/conflicts.md
+              echo
+              echo "Resolve them on the \`upstream-sync\` branch (conflict markers were committed as-is) and push a normal commit before merging — that push will run CI normally."
+            } > /tmp/pr-body.md
+          else
+            {
+              echo "Auto-generated sync from [chaitanyagiri/munder-difflin](https://github.com/chaitanyagiri/munder-difflin)'s \`main\`. Merged cleanly — still worth a look at anything touching this fork's own files (electron-builder.yml, src/main/updater.ts, package.json, RELEASE.md, README*.md, src/renderer/src/i18n/) before merging."
+            } > /tmp/pr-body.md
+          fi
+          gh pr create --base main --head upstream-sync \
+            --title "Sync upstream: pull latest from chaitanyagiri/munder-difflin" \
+            --body-file /tmp/pr-body.md
