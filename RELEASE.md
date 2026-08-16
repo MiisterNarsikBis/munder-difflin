@@ -1,4 +1,4 @@
-# Munder Difflin v0.4.4 (French build)
+# Munder Difflin v0.4.5 (French build)
 
 **A local hive of Claude Code, Antigravity, Codex, Grok & Copilot agents that run themselves** — messaging,
 routing, and remembering, coordinated by your clone, Michael, who you talk to. Local-first and open source.
@@ -12,7 +12,23 @@ routing, and remembering, coordinated by your clone, Michael, who you talk to. L
 
 ---
 
-## What's new in 0.4.4 — *The app speaks French*
+## What's new in 0.4.5 — *Remote Control is opt-in now*
+
+**Michael no longer auto-enables Remote Control behind your back.** Every boot — fresh spawn or
+resumed session — used to silently re-run `/remote-control`, with no switch to turn it off. It's
+now a plain toggle, and it ships **off by default**.
+
+- **New toggle: Settings → General → Environment → "Enable Remote Control on launch."** Off by
+  default. Turn it on if you want to approve Michael's permission prompts from claude.ai or the
+  mobile app; leave it off and Remote Control stays off until you ask for it.
+- **Fixed: the auto-updater's fallback path pointed at the wrong repo.** The native updater
+  already checked this fork's releases correctly, but the fallback poll (used on Windows portable
+  builds, or if the native check errors) and the "open release" link were hardcoded to the
+  upstream project. Both now correctly point here.
+
+---
+
+## Still new in 0.4.4 — *The app speaks French*
 
 **A complete French translation**, toggleable from **Settings → General → Language** with no
 restart. Onboarding, the Command Center, Settings, the IDE, the Triggers hub, tooltips, status
@@ -59,25 +75,6 @@ the app's own pixel art, on the brand yellow, looking straight back at you.
 
 ---
 
-## Still new in 0.4.2 — *Anonymous usage stats, done in the open*
-
-Munder Difflin now sends a **small set of anonymous usage events** (app opened, agent spawned,
-feature used) so we can tell whether features are actually used. It is built the way an
-open-source project should build it:
-
-- **[TELEMETRY.md](https://github.com/MiisterNarsikBis/munder-difflin/blob/main/TELEMETRY.md) is the
-  complete contract.** Every event and property is listed there, and the code enforces that list
-  as a hard allowlist — anything not in the table cannot be sent. No prompts, no transcripts, no
-  file paths, no repo names, no identifiers. Events are PostHog *anonymous events* (no person
-  profile, no identity), keyed by a random UUID you can delete.
-- **Opt-out, three ways.** Uncheck it during onboarding, flip **Settings → General → Anonymous
-  usage stats**, or set the standard `DO_NOT_TRACK` env var.
-- **Forks send nothing.** The analytics key is injected only in release CI — building from
-  source produces a build where the analytics module is a complete no-op. (This build is a fork
-  release with no analytics key configured, so it sends nothing either.)
-
----
-
 > [!NOTE]
 > **Auto-update carries you here from v0.3.7 or later.** If you are still on v0.3.5 or v0.3.6,
 > those builds shipped the broken updater and need one manual install — grab the download below,
@@ -87,6 +84,9 @@ open-source project should build it:
 
 ## Previously
 
+- **0.4.2** — *anonymous usage stats, done in the open*: a small, fully-documented set of
+  anonymous usage events (see [TELEMETRY.md](https://github.com/MiisterNarsikBis/munder-difflin/blob/main/TELEMETRY.md)),
+  opt-out three ways, forks send nothing.
 - **0.4.1** — *the app says what the site says*: Michael described as your clone (not the "GOD
   agent") throughout onboarding, and a rewritten opening that names all ten engines.
 - **0.4.0** — *the brand grew up*: one yellow "MD" mark across the dock icon, in-app logo, site
@@ -123,22 +123,22 @@ Apple Silicon and Intel.
 ### 🍎 macOS
 | Build | File |
 |---|---|
-| Universal (Apple Silicon + Intel) | [`Munder-Difflin-0.4.4-mac-universal.dmg`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.4-mac-universal.dmg) |
+| Universal (Apple Silicon + Intel) | [`Munder-Difflin-0.4.5-mac-universal.dmg`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.5-mac-universal.dmg) |
 
 ### 🪟 Windows
 | Build | File |
 |---|---|
-| Installer (x64) — *recommended* | [`Munder-Difflin-0.4.4-win-x64-setup.exe`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.4-win-x64-setup.exe) |
-| Portable (x64, no install) | [`Munder-Difflin-0.4.4-win-x64-portable.exe`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.4-win-x64-portable.exe) |
+| Installer (x64) — *recommended* | [`Munder-Difflin-0.4.5-win-x64-setup.exe`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.5-win-x64-setup.exe) |
+| Portable (x64, no install) | [`Munder-Difflin-0.4.5-win-x64-portable.exe`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.5-win-x64-portable.exe) |
 
 ### 🐧 Linux
 | Build | File |
 |---|---|
-| AppImage (x86_64) | [`Munder-Difflin-0.4.4-linux-x86_64.AppImage`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.4-linux-x86_64.AppImage) |
+| AppImage (x86_64) | [`Munder-Difflin-0.4.5-linux-x86_64.AppImage`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/Munder-Difflin-0.4.5-linux-x86_64.AppImage) |
 
 ### 📦 Source
-[Source code (zip)](https://github.com/MiisterNarsikBis/munder-difflin/archive/refs/tags/v0.4.4.zip) ·
-[Source code (tar.gz)](https://github.com/MiisterNarsikBis/munder-difflin/archive/refs/tags/v0.4.4.tar.gz)
+[Source code (zip)](https://github.com/MiisterNarsikBis/munder-difflin/archive/refs/tags/v0.4.5.zip) ·
+[Source code (tar.gz)](https://github.com/MiisterNarsikBis/munder-difflin/archive/refs/tags/v0.4.5.tar.gz)
 
 > **Verify your download:** [`SHA256SUMS.txt`](https://github.com/MiisterNarsikBis/munder-difflin/releases/latest/download/SHA256SUMS.txt) — then `shasum -a 256 -c SHA256SUMS.txt` (macOS/Linux) or `Get-FileHash` (Windows).
 

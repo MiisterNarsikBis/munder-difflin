@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.5] — 2026-08-16
+
+**Remote Control is opt-in now.** Michael used to re-run `/remote-control` on every single boot —
+fresh spawn or resumed session — with no way to turn it off. It is now a plain Settings toggle,
+**off by default**.
+
+### Added
+- **"Enable Remote Control on launch" toggle** (Settings → General → Environment). Off by
+  default: Michael no longer auto-enables Remote Control unless you explicitly opt in.
+  `remoteControlAtStartup` on `HarnessConfig`, gating the one call site in `useHive`'s boot
+  sequence (`src/renderer/src/hooks/useHive.ts`).
+
+### Fixed
+- **Auto-updater pointed at the wrong repo.** `src/main/updater.ts` had the upstream repo
+  (`chaitanyagiri/munder-difflin`) hardcoded for the fallback `releases/latest` poll and the
+  "open release" link, while `electron-builder.yml`'s `publish` block (used by the native
+  updater) already targeted this fork. Builds on the fallback path — Windows portable, or a
+  native-updater error — were sending users to the wrong project's release page. Both now point
+  at `MiisterNarsikBis/munder-difflin`; `package.json`'s `repository` field is updated to match.
+
 ## [0.4.4] — 2026-08-15
 
 **The app speaks French.** Munder Difflin's UI — every screen, dialog, tooltip and status
